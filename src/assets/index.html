@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* with flex like a piano tiles */
+      body {
+        font-size: 16px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .note {
+        width: 3rem;
+        height: 6rem;
+        position: relative;
+        border: 1px solid #2345;
+        background-color: #f2f3f4;
+        color: #234;
+        border-radius: 0.3rem;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0.4rem;
+      }
+
+      .note[id$="#"] {
+        width: 1.5rem;
+        height: 2.5rem;
+        background-color: #234;
+        color: #f2f3f4;
+        margin-left: -1.5rem;
+        z-index: 12;
+        align-items: flex-start;
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      id="LA"
+      data-frecuency="220.00"
+      class="note"
+      onclick="oscillator(220.00)"
+    >
+      A
+    </button>
+    <button
+      id="LA#"
+      data-frecuency="233.08"
+      class="note"
+      onclick="oscillator(233.08)"
+    >
+      #
+    </button>
+    <button
+      id="SI"
+      data-frecuency="246.94"
+      class="note"
+      onclick="oscillator(246.94)"
+    >
+      B
+    </button>
+    <button
+      id="DO"
+      data-frecuency="261.63"
+      class="note"
+      onclick="oscillator(261.63)"
+    >
+      C
+    </button>
+    <button
+      id="DO#"
+      data-frecuency="277.18"
+      class="note"
+      onclick="oscillator(277.18)"
+    >
+      #
+    </button>
+    <button
+      id="RE"
+      data-frecuency="293.66"
+      class="note"
+      onclick="oscillator(293.66)"
+    >
+      D
+    </button>
+    <button
+      id="RE#"
+      data-frecuency="311.13"
+      class="note"
+      onclick="oscillator(311.13)"
+    >
+      #
+    </button>
+    <button
+      id="MI"
+      data-frecuency="329.63"
+      class="note"
+      onclick="oscillator(329.63)"
+    >
+      E
+    </button>
+    <button
+      id="FA"
+      data-frecuency="349.23"
+      class="note"
+      onclick="oscillator(349.23)"
+    >
+      F
+    </button>
+    <button
+      id="FA#"
+      data-frecuency="369.99"
+      class="note"
+      onclick="oscillator(369.99)"
+    >
+      #
+    </button>
+    <button
+      id="SOL"
+      data-frecuency="392.00"
+      class="note"
+      onclick="oscillator(392.00)"
+    >
+      G
+    </button>
+    <button
+      id="SOL#"
+      data-frecuency="415.30"
+      class="note"
+      onclick="oscillator(415.30)"
+    >
+      #
+    </button>
+    <script>
+      // Función para generar el sonido con una frecuencia específica
+      function oscillator(frecuencia) {
+        // Verificamos si el navegador soporta la API de AudioContext
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+          console.error("Tu navegador no soporta la API de AudioContext.");
+          return;
+        }
+
+        // Creamos una instancia de AudioContext
+        const audioContext = new AudioContext();
+
+        // Creamos un oscilador
+        const oscillator = audioContext.createOscillator();
+
+        // Establecemos la frecuencia deseada para el oscilador
+        oscillator.frequency.value = frecuencia;
+
+        // Conectamos el oscilador al destino de audio (altavoces)
+        oscillator.connect(audioContext.destination);
+
+        // Iniciamos el oscilador para generar el sonido
+        oscillator.start();
+
+        // Detenemos el sonido después de un tiempo (en este caso, 1 segundo)
+        setTimeout(() => oscillator.stop(), 300);
+      }
+
+      function getNote(frecuency, ctx) {
+        // Creamos un oscilador
+        const oscillator = ctx.createOscillator();
+        // Establecemos la frecuencia deseada para el oscilador
+        oscillator.frequency.value = frecuency;
+        // Conectamos el oscilador al destino de audio (altavoces)
+        oscillator.start();
+
+        return oscillator;
+      }
+
+      (() => {
+        // Verificamos si el navegador soporta la API de AudioContext
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+          console.error("Tu navegador no soporta la API de AudioContext.");
+          return;
+        }
+
+        // Creamos una instancia de AudioContext
+        const audioContext = new AudioContext();
+
+        const keymap = {
+          a: ["LA", getNote(220.0, audioContext)],
+          w: ["LA#", getNote(233.08, audioContext)],
+          s: ["SI", getNote(246.94, audioContext)],
+          d: ["DO", getNote(261.63, audioContext)],
+          r: ["DO#", getNote(277.18, audioContext)],
+          f: ["RE", getNote(293.66, audioContext)],
+          t: ["RE#", getNote(311.13, audioContext)],
+          g: ["MI", getNote(329.63, audioContext)],
+          h: ["FA", getNote(349.23, audioContext)],
+          u: ["FA#", getNote(369.99, audioContext)],
+          j: ["SOL", getNote(392.0, audioContext)],
+          i: ["SOL#", getNote(415.3, audioContext)],
+        };
+
+        document.addEventListener("keydown", (event) => {
+          const key = event.key;
+          const [note, oscillator] = keymap[key];
+          const button = document.getElementById(note);
+          if (keymap[key]) {
+            oscillator.connect(audioContext.destination);
+            button.style.backgroundColor = "green";
+          }
+        });
+
+        document.addEventListener("keyup", (event) => {
+          const key = event.key;
+          const [note, oscillator] = keymap[key];
+          const button = document.getElementById(note);
+          oscillator.disconnect(audioContext.destination);
+          button.style.backgroundColor = "";
+        });
+      })();
+    </script>
+  </body>
+</html>
