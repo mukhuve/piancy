@@ -1,5 +1,5 @@
 :host {
-  @apply relative flex flex-row flex-wrap items-end justify-center p-4 w-12 h-32;
+  @apply relative flex flex-row flex-wrap items-end justify-center p-4 w-12 h-32 transition-all duration-75 ease-out;
   @apply border-none bg-white text-black shadow-lg font-bold rounded cursor-pointer;
   user-select: none;
 

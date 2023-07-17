@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { PianoComponent } from './components/piano/piano.component';
-import { Component, HostBinding } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostBinding,
+  ViewChild,
+} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -9,24 +14,19 @@ import { Component, HostBinding } from '@angular/core';
   styleUrls: ['./app.component.scss'],
   imports: [CommonModule, PianoComponent],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   title = 'piancy';
+
+  @ViewChild(PianoComponent)
+  piano!: PianoComponent;
 
   @HostBinding('style.background-color')
   color = 'rgb(0, 0, 0)';
 
-  set frequency(frequency: number) {
-    const light = this.soundToLight(frequency);
-    const rgb = this.lightToRGB(light);
+  async ngAfterViewInit() {}
 
-    this.color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-  }
-
-  constructor() {}
-
-  soundToLight(frequency: number) {
-    const minSound = 220; // 20 Hz (sonido más grave perceptible)
-    const maxSound = 800; // 20,000 Hz (sonido más agudo perceptible)
+  soundToLight(frequency: number, range: [number, number] = [220, 880]) {
+    const [minSound, maxSound] = range; // [220, 880] Hz (sonido más grave y más agudo del piano)
     const minLight = 700; // 700 nm (rojo)
     const maxLight = 400; // 400 nm (violeta)
     const deltaSound = maxSound - minSound; // Diferencia entre la frecuencia más aguda y la más grave
@@ -77,9 +77,10 @@ export class AppComponent {
     return { r, g, b };
   }
 
-  colorize(frequencies: number[]) {
-    const colors = frequencies
-      .map((frequency) => this.soundToLight(frequency))
+  colorize(event: { notes: number[]; piano: PianoComponent }) {
+    const range = event.piano.frequencyRange as [number, number];
+    const colors = event.notes
+      .map((frequency) => this.soundToLight(frequency, range))
       .map((light) => this.lightToRGB(light));
 
     // conbine rgb colors
@@ -95,5 +96,7 @@ export class AppComponent {
     );
 
     this.color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    console.log(colors);
+    console.log(this.color);
   }
 }

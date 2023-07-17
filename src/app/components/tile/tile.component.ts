@@ -1,4 +1,6 @@
 import {
+  AfterViewChecked,
+  AfterViewInit,
   Component,
   EventEmitter,
   Host,
@@ -18,15 +20,15 @@ import { Tile } from './tile';
   templateUrl: './tile.component.html',
   styleUrls: ['./tile.component.scss'],
 })
-export class TileComponent implements OnInit {
+export class TileComponent implements OnInit, AfterViewInit {
   @Input() tile!: Tile;
-  @Input() ctx!: AudioContext;
+  ctx: AudioContext = new AudioContext();
+  oscillator!: OscillatorNode;
   name: string = '';
+  pressed = false;
 
   @HostBinding('class.active')
   active = false;
-
-  pressed = false;
 
   @Output()
   actived = new EventEmitter<boolean>();
@@ -38,9 +40,13 @@ export class TileComponent implements OnInit {
 
   constructor() {}
 
+  ngAfterViewInit() {}
+
   ngOnInit() {
-    const { note, sharp } = this.tile;
-    this.name = sharp ? '#' : note;
+    this.oscillator = this.ctx.createOscillator();
+    this.oscillator.frequency.value = this.tile.frequency;
+    this.ctx.resume();
+    this.oscillator.start();
   }
 
   @HostListener('window:touchstart', ['$event'])
@@ -62,22 +68,25 @@ export class TileComponent implements OnInit {
       !!event.type.match(/start|down/) ||
       (!!event.type.match(/enter/) && this.pressed);
 
-    if (active === this.active) return;
-    const { key, oscillator } = this.tile;
-
-    if (!oscillator) return;
     if (
       event instanceof KeyboardEvent &&
-      (event.key !== key || event.ctrlKey)
+      (event.key !== this.tile.key || event.ctrlKey)
     ) {
       return;
     }
 
+    this.push(active);
+  }
+
+  push(active = true) {
+    if (active === this.active) return;
+    if (!this.oscillator) return;
+
     this.active = active;
     if (this.active) {
-      oscillator.connect(this.ctx.destination);
+      this.oscillator.connect(this.ctx.destination);
     } else {
-      oscillator.disconnect(this.ctx.destination);
+      this.oscillator.disconnect(this.ctx.destination);
     }
 
     this.actived.emit(this.active);
