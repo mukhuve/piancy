@@ -1,0 +1,17 @@
+:host {
+  @apply relative flex flex-row flex-wrap items-end justify-center p-4 w-12 h-32;
+  @apply border-none bg-white text-black shadow-lg font-bold rounded cursor-pointer;
+  user-select: none;
+
+  margin: 0.1rem;
+}
+
+:host[sharp="true"] {
+  @apply w-6 h-14 bg-stone-700 text-white z-10 items-center p-0 shadow-sm;
+  border-radius: 0 0.25rem 0 0.25rem;
+  margin-left: -1.6rem;
+}
+
+:host.active {
+  @apply bg-green;
+}

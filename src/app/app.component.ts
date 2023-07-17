@@ -1,99 +1,99 @@
-import { Component, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { PianoComponent } from './components/piano/piano.component';
+import { Component, HostBinding } from '@angular/core';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  imports: [CommonModule, PianoComponent],
 })
 export class AppComponent {
   title = 'piancy';
-  ctx!: AudioContext;
-  keymap: Record<string, [string, OscillatorNode]> = {};
 
-  constructor() {
-    const AudioContext =
-      window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) {
-      console.error('Tu navegador no soporta la API de AudioContext.');
-      return;
+  @HostBinding('style.background-color')
+  color = 'rgb(0, 0, 0)';
+
+  set frequency(frequency: number) {
+    const light = this.soundToLight(frequency);
+    const rgb = this.lightToRGB(light);
+
+    this.color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+  }
+
+  constructor() {}
+
+  soundToLight(frequency: number) {
+    const minSound = 220; // 20 Hz (sonido más grave perceptible)
+    const maxSound = 800; // 20,000 Hz (sonido más agudo perceptible)
+    const minLight = 700; // 700 nm (rojo)
+    const maxLight = 400; // 400 nm (violeta)
+    const deltaSound = maxSound - minSound; // Diferencia entre la frecuencia más aguda y la más grave
+    const deltaLight = maxLight - minLight; // Diferencia entre la longitud de onda más larga y la más corta
+    const proportion = deltaLight / deltaSound;
+
+    return minLight + (frequency - minSound) * proportion;
+  }
+
+  // Función para convertir una longitud de onda visible (en nm) a un objeto RGB
+  lightToRGB(light: number) {
+    let r, g, b;
+    if (light >= 380 && light < 440) {
+      r = -(light - 440) / (440 - 380);
+      g = 0.0;
+      b = 1.0;
+    } else if (light >= 440 && light < 490) {
+      r = 0.0;
+      g = (light - 440) / (490 - 440);
+      b = 1.0;
+    } else if (light >= 490 && light < 510) {
+      r = 0.0;
+      g = 1.0;
+      b = -(light - 510) / (510 - 490);
+    } else if (light >= 510 && light < 580) {
+      r = (light - 510) / (580 - 510);
+      g = 1.0;
+      b = 0.0;
+    } else if (light >= 580 && light < 645) {
+      r = 1.0;
+      g = -(light - 645) / (645 - 580);
+      b = 0.0;
+    } else if (light >= 645 && light <= 780) {
+      r = 1.0;
+      g = 0.0;
+      b = 0.0;
+    } else {
+      r = 0.0;
+      g = 0.0;
+      b = 0.0;
     }
 
-    this.ctx = new AudioContext();
+    const factor = 255;
+    r = Math.round(r * factor);
+    g = Math.round(g * factor);
+    b = Math.round(b * factor);
 
-    this.keymap = {
-      a: ['LA', this.getNote(220.0)],
-      w: ['LA#', this.getNote(233.08)],
-      s: ['SI', this.getNote(246.94)],
-      d: ['DO', this.getNote(261.63)],
-      r: ['DO#', this.getNote(277.18)],
-      f: ['RE', this.getNote(293.66)],
-      t: ['RE#', this.getNote(311.13)],
-      g: ['MI', this.getNote(329.63)],
-      h: ['FA', this.getNote(349.23)],
-      u: ['FA#', this.getNote(369.99)],
-      j: ['SOL', this.getNote(392.0)],
-      i: ['SOL#', this.getNote(415.3)],
-    };
+    return { r, g, b };
   }
 
-  @HostListener('document:keydown', ['$event'])
-  keydown(event: KeyboardEvent) {
-    const key = event.key;
-    if (!this.keymap[key]) return;
-    const [note, oscillator] = this.keymap[key];
-    const button = document.getElementById(note) as HTMLButtonElement;
-    if (this.keymap[key]) {
-      oscillator.connect(this.ctx.destination);
-      button.style.backgroundColor = 'green';
-    }
-  }
+  colorize(frequencies: number[]) {
+    const colors = frequencies
+      .map((frequency) => this.soundToLight(frequency))
+      .map((light) => this.lightToRGB(light));
 
-  @HostListener('document:keyup', ['$event'])
-  keyup(event: KeyboardEvent) {
-    const key = event.key;
-    if (!this.keymap[key]) return;
-    const [note, oscillator] = this.keymap[key];
-    const button = document.getElementById(note) as HTMLButtonElement;
-    oscillator.disconnect(this.ctx.destination);
-    button.style.backgroundColor = '';
-  }
+    // conbine rgb colors
+    const rgb = colors.reduce(
+      (acc, color) => {
+        const { r, g, b } = color;
+        acc.r += r;
+        acc.g += g;
+        acc.b += b;
+        return acc;
+      },
+      { r: 0, g: 0, b: 0 }
+    );
 
-  oscillator(frecuency: number) {
-    // Verificamos si el navegador soporta la API de AudioContext
-    const AudioContext =
-      window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) {
-      console.error('Tu navegador no soporta la API de AudioContext.');
-      return;
-    }
-
-    // Creamos una instancia de AudioContext
-    const audioContext = new AudioContext();
-
-    // Creamos un oscilador
-    const oscillator = audioContext.createOscillator();
-
-    // Establecemos la frecuency deseada para el oscilador
-    oscillator.frequency.value = frecuency;
-
-    // Conectamos el oscilador al destino de audio (altavoces)
-    oscillator.connect(audioContext.destination);
-
-    // Iniciamos el oscilador para generar el sonido
-    oscillator.start();
-
-    // Detenemos el sonido después de un tiempo (en este caso, 1 segundo)
-    setTimeout(() => oscillator.stop(), 300);
-  }
-
-  getNote(frecuency: number) {
-    // Creamos un oscilador
-    const oscillator = this.ctx.createOscillator();
-    // Establecemos la frecuencia deseada para el oscilador
-    oscillator.frequency.value = frecuency;
-    // Conectamos el oscilador al destino de audio (altavoces)
-    oscillator.start();
-
-    return oscillator;
+    this.color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
   }
 }

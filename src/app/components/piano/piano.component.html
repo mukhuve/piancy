@@ -1,0 +1,8 @@
+<section
+  class="h-10 text-2xl font-bold border-[0.1rem] border-gold-regular border-opacity-5 w-full rounded-md px-2 py-6 flex items-center"
+>
+  <h2 class="text-white">Piancy</h2>
+</section>
+<section class="flex flex-row rounded-md shadow-inner">
+  <app-tile *ngFor="let tile of tiles" [tile]="tile" [ctx]="ctx" (actived)="actived(tile, $event)"> </app-tile>
+</section>

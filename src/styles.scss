@@ -1,15 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
+  @apply bg-gray-100 flex flex-row items-center justify-center;
   font-size: 16px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
+  width: 100svw;
+  height: 100svh;
 
   * {
     box-sizing: border-box;
   }
+}
+
+h1,
+h2 {
+  font-family: "Dancing Script", cursive;
 }
