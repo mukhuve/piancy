@@ -5,12 +5,11 @@ import {
   Input,
   OnInit,
   Output,
-  ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { TileComponent } from '../tile/tile.component';
-import { CHROMATIC_SCALE, PIANO_KEYS } from './piano.constants';
+import { chromaticMinor } from 'src/app/helpers/scales';
 import { Tile } from '../tile/tile';
+import { TileComponent } from '../tile/tile.component';
 
 @Component({
   selector: 'app-piano',
@@ -51,10 +50,8 @@ export class PianoComponent implements OnInit {
     return [start, end];
   }
 
-  constructor() {}
-
   ngOnInit() {
-    this.tiles = this.chromaticScale();
+    this.tiles = chromaticMinor();
   }
 
   actived(tile: Tile, active: boolean) {
@@ -92,7 +89,7 @@ export class PianoComponent implements OnInit {
         return { note, duration: +miliseconds };
       });
 
-    for (let { note, duration } of track) {
+    for (const { note, duration } of track) {
       if (!note) {
         await new Promise((resolve) => setTimeout(resolve, duration));
         continue;
@@ -108,34 +105,6 @@ export class PianoComponent implements OnInit {
     } else if (event.key === 'ArrowDown') {
       this.base--;
     }
-    this.tiles = this.chromaticScale();
-  }
-
-  chromaticScale() {
-    const A0 = 27.5;
-    const ratio = 2 ** (1 / 12);
-    const frequencies: Tile[] = [];
-    const [start, end] = [this.base, this.base + this.octaves];
-    const scale = CHROMATIC_SCALE;
-
-    for (let octave = start; octave <= end; octave++) {
-      const keyBase = (octave - start) * scale.length;
-      for (let [i, name] of CHROMATIC_SCALE.entries()) {
-        const base = A0 * 2 ** octave;
-        const frequency = base * ratio ** i;
-        const key = PIANO_KEYS[keyBase + i] || '';
-        const noteOctave = name >= 'C' ? octave + 1 : octave;
-        const note = `${name}${noteOctave}`;
-        const tile = new Tile(note, frequency, key);
-
-        frequencies.push(tile);
-      }
-    }
-
-    return frequencies;
-  }
-
-  chromaticScaleFromC() {
-    // TODO: implementar escala cromática a partir de C
+    this.tiles = chromaticMinor();
   }
 }

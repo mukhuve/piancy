@@ -1,16 +1,12 @@
+import { CommonModule } from '@angular/common';
 import {
-  AfterViewChecked,
-  AfterViewInit,
   Component,
   EventEmitter,
-  Host,
   HostBinding,
   HostListener,
   Input,
-  OnInit,
   Output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Tile } from './tile';
 
 @Component({
@@ -20,11 +16,13 @@ import { Tile } from './tile';
   templateUrl: './tile.component.html',
   styleUrls: ['./tile.component.scss'],
 })
-export class TileComponent implements OnInit, AfterViewInit {
-  @Input() tile!: Tile;
-  ctx: AudioContext = new AudioContext();
+export class TileComponent {
+  @Input()
+  tile!: Tile;
+  ctx!: AudioContext;
   oscillator!: OscillatorNode;
-  name: string = '';
+
+  name = '';
   pressed = false;
 
   @HostBinding('class.active')
@@ -36,17 +34,6 @@ export class TileComponent implements OnInit, AfterViewInit {
   @HostBinding('attr.sharp')
   get sharp() {
     return this.tile.sharp;
-  }
-
-  constructor() {}
-
-  ngAfterViewInit() {}
-
-  ngOnInit() {
-    this.oscillator = this.ctx.createOscillator();
-    this.oscillator.frequency.value = this.tile.frequency;
-    this.ctx.resume();
-    this.oscillator.start();
   }
 
   @HostListener('window:touchstart', ['$event'])
@@ -78,17 +65,40 @@ export class TileComponent implements OnInit, AfterViewInit {
     this.push(active);
   }
 
-  push(active = true) {
+  sound(active: boolean) {
     if (active === this.active) return;
-    if (!this.oscillator) return;
+    if (active) {
+      if (!this.ctx) {
+        this.ctx = new AudioContext();
+      }
+      if (!this.oscillator) {
+        this.oscillator = this.ctx.createOscillator();
+        this.oscillator.frequency.value = this.tile.frequency;
+        // this.oscillator.type = 'sine';
+        // this.oscillator.type = 'square';
+        // this.oscillator.type = 'triangle';
+        // this.oscillator.type = 'sawtooth';
+        this.oscillator.setPeriodicWave(
+          this.ctx.createPeriodicWave(
+            new Float32Array([0, 0.2, 0.4, 0.6, 0.8, 1]),
+            new Float32Array([0, 0, 0, 0, 0, 0]),
+            // { disableNormalization: true }
+          )
+        );
 
-    this.active = active;
-    if (this.active) {
+        this.oscillator.start();
+      }
+
       this.oscillator.connect(this.ctx.destination);
-    } else {
+    } else if (this.oscillator) {
       this.oscillator.disconnect(this.ctx.destination);
     }
 
+    this.active = active;
     this.actived.emit(this.active);
+  }
+
+  push(active = true) {
+    this.sound(active);
   }
 }

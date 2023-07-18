@@ -14,7 +14,7 @@ import {
   styleUrls: ['./app.component.scss'],
   imports: [CommonModule, PianoComponent],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
   title = 'piancy';
 
   @ViewChild(PianoComponent)
@@ -22,8 +22,6 @@ export class AppComponent implements AfterViewInit {
 
   @HostBinding('style.background-color')
   color = 'rgb(0, 0, 0)';
-
-  async ngAfterViewInit() {}
 
   soundToLight(frequency: number, range: [number, number] = [220, 880]) {
     const [minSound, maxSound] = range; // [220, 880] Hz (sonido más grave y más agudo del piano)
@@ -96,7 +94,5 @@ export class AppComponent implements AfterViewInit {
     );
 
     this.color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-    console.log(colors);
-    console.log(this.color);
   }
 }
