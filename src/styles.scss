@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100 flex flex-row items-center justify-center;
+  @apply bg-gray-100 flex flex-row items-center justify-center dark:bg-black dark:text-white;
   font-size: 16px;
   width: 100svw;
   height: 100svh;
@@ -18,4 +18,8 @@ body {
 h1,
 h2 {
   font-family: "Dancing Script", cursive;
+}
+
+button.btn {
+  @apply rounded-lg shadow-md flex flex-row items-center justify-center;
 }

@@ -1,4 +1,11 @@
-<small *ngIf="!tile.sharp" class="mt-10 text-orange-300 text-xs">{{
-  tile.frequency | number : "1.1-1"
-}}</small>
-{{ tile.name }}
+<strong>
+  {{ tile.name }}
+</strong>
+<small
+  *ngIf="!tile.sharp"
+  class="text-black text-[0.5rem] pointer-events-none mb-1 dark:text-gold-light"
+  >{{ tile.frequency | number : "1.1-1" }}</small
+>
+<small class="key">
+  {{ tile.key || "×" }}
+</small>

@@ -1,17 +1,40 @@
 :host {
-  @apply relative flex flex-row flex-wrap items-end justify-center p-4 w-12 h-32 transition-all duration-75 ease-out;
-  @apply border-none bg-white text-black shadow-lg font-bold rounded cursor-pointer;
+  @apply relative flex flex-col items-center justify-end p-2 w-12 h-32 transition-all duration-75 ease-out;
+  @apply border-none bg-white text-black shadow-lg font-bold cursor-pointer overflow-hidden;
+  @apply text-opacity-70 hover:text-opacity-100;
+
+  border-radius: 0 0 0.25rem 0.25rem;
   user-select: none;
 
-  margin: 0.1rem;
+  .key {
+    @apply w-6 h-6 rounded-sm flex items-center justify-center text-xs;
+    @apply pointer-events-none bg-stone-900 bg-opacity-30 text-inherit;
+  }
 }
 
 :host[sharp="true"] {
-  @apply w-6 h-14 bg-stone-700 text-white z-10 items-center p-0 shadow-sm;
-  border-radius: 0 0.25rem 0 0.25rem;
-  margin-left: -1.6rem;
+  @apply w-6 h-12 bg-stone-700 text-white z-10 items-center p-0 shadow-sm pb-2;
+  @apply text-opacity-70 hover:text-opacity-100;
+
+  margin-left: -1.4rem;
+  margin-right: -0.3rem;
+
+  .key {
+    @apply w-3 h-3;
+    font-size: 0.5rem;
+  }
+}
+
+:is(.dark) {
+  :host:not(.active) {
+    @apply text-opacity-70 hover:text-opacity-100;
+  }
+  :host[sharp="true"]:not(.active) {
+    @apply bg-gold-light text-stone-700;
+    @apply text-opacity-70 hover:text-opacity-100;
+  }
 }
 
 :host.active {
-  @apply bg-green;
+  @apply bg-green text-white shadow-xl;
 }

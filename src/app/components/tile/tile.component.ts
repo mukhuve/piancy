@@ -74,17 +74,17 @@ export class TileComponent {
       if (!this.oscillator) {
         this.oscillator = this.ctx.createOscillator();
         this.oscillator.frequency.value = this.tile.frequency;
-        // this.oscillator.type = 'sine';
+        this.oscillator.type = 'sine';
         // this.oscillator.type = 'square';
         // this.oscillator.type = 'triangle';
         // this.oscillator.type = 'sawtooth';
-        this.oscillator.setPeriodicWave(
-          this.ctx.createPeriodicWave(
-            new Float32Array([0, 0.2, 0.4, 0.6, 0.8, 1]),
-            new Float32Array([0, 0, 0, 0, 0, 0]),
-            // { disableNormalization: true }
-          )
-        );
+        // this.oscillator.setPeriodicWave(
+        //   this.ctx.createPeriodicWave(
+        //     new Float32Array([0, 0.2, 0.4, 0.6, 0.8, 1]),
+        //     new Float32Array([0, 0, 0, 0, 0, 0]),
+        //     // { disableNormalization: true }
+        //   )
+        // );
 
         this.oscillator.start();
       }

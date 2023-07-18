@@ -8,7 +8,7 @@ export function chromaticMinor(base = 3, octaves = 2) {
   const A0 = 27.5;
   const ratio = 2 ** (1 / 12);
   const frequencies: Tile[] = [];
-  const [start, end] = [base, base + octaves];
+  const [start, end] = [base, base + octaves - 1];
   const scale = CHROMATIC_SCALE;
 
   for (let octave = start; octave <= end; octave++) {

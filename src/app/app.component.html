@@ -1,1 +1,18 @@
-<app-piano [base]="2" [octaves]="3" (output)="colorize($event)"></app-piano>
+<header class="w-full absolute top-0 flex justify-end items-center p-3">
+  <button
+    class="btn bg-black text-white p-4 dark:bg-white dark:text-black"
+    (click)="toggleDarkMode()"
+  >
+    <i class="material-icons-round">
+      {{ darkmode ? "wb_sunny" : "dark_mode" }}
+    </i>
+  </button>
+</header>
+<app-piano
+  #piano
+  class="dark:bg-stone-700"
+  [base]="2"
+  [octaves]="3"
+  (output)="colorize($event)"
+></app-piano>
+<div class="ind" [class.active]="piano?.active"></div>
