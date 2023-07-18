@@ -74,9 +74,9 @@ export class TileComponent {
       if (!this.oscillator) {
         this.oscillator = this.ctx.createOscillator();
         this.oscillator.frequency.value = this.tile.frequency;
-        this.oscillator.type = 'sine';
+        // this.oscillator.type = 'sine';
         // this.oscillator.type = 'square';
-        // this.oscillator.type = 'triangle';
+        this.oscillator.type = 'triangle';
         // this.oscillator.type = 'sawtooth';
         // this.oscillator.setPeriodicWave(
         //   this.ctx.createPeriodicWave(
