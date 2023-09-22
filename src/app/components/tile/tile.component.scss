@@ -18,11 +18,11 @@
 }
 
 :host[sharp="true"] {
-  @apply w-6 h-12 bg-stone-700 text-white z-10 items-center p-0 shadow-sm pb-2;
+  @apply w-6 h-[5rem] bg-stone-700 text-white z-10 items-center p-0 shadow-sm pb-2;
   @apply text-opacity-70 hover:text-opacity-100;
 
-  margin-left: -1.4rem;
-  margin-right: -0.3rem;
+  margin-left: -0.9rem;
+  margin-right: -0.8rem;
 
   .key {
     @apply w-3 h-3;

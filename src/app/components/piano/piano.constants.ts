@@ -14,4 +14,32 @@ export const CHROMATIC_SCALE = [
   'G#',
 ];
 
-export const PIANO_KEYS = ['a', 'w', 's', 'd', 'r', 'f', 't', 'g', 'h', 'u', 'j', 'i', 'k', 'o', 'l', ';', '[', "'", ']'];
+export const PIANO_KEYS = [
+  'q',
+  '2',
+  'w',
+  'e',
+  '4',
+  'r',
+  '5',
+  't',
+  'y',
+  '7',
+  'u',
+  '8',
+  'i',
+  '9',
+  'o',
+  'z',
+  's',
+  'x',
+  'd',
+  'c',
+  'v',
+  'g',
+  'b',
+  'h',
+  'n',
+  'j',
+  'm',
+];

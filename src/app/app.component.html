@@ -18,8 +18,8 @@
 <app-piano
   #piano
   class="dark:bg-stone-700"
-  [base]="2"
-  [octaves]="3"
+  [base]="3"
+  [octaves]="4"
   (output)="colorize($event)"
 ></app-piano>
 <div class="ind" [class.active]="piano?.active"></div>
