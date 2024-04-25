@@ -72,10 +72,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "piancy:build:production"
+              "buildTarget": "piancy:build:production"
             },
             "development": {
-              "browserTarget": "piancy:build:development"
+              "buildTarget": "piancy:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "piancy:build"
+            "buildTarget": "piancy:build"
           }
         },
         "test": {
