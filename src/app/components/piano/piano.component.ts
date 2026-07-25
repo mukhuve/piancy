@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -7,15 +7,15 @@ import {
   Output,
   ViewChildren,
 } from '@angular/core';
-import { chromaticMinor } from 'src/app/helpers/scales';
+import { chromaticMinor } from '../../helpers/scales';
 import { Tile } from '../tile/tile';
 import { TileComponent } from '../tile/tile.component';
 
 @Component({
   selector: 'app-piano',
-  standalone: true,
-  imports: [CommonModule, TileComponent],
+  imports: [TileComponent],
   templateUrl: './piano.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./piano.component.scss'],
 })
 export class PianoComponent implements OnInit {

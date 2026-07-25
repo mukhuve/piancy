@@ -1,13 +1,17 @@
-import { CommonModule } from '@angular/common';
-import { Component, HostBinding, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostBinding,
+  ViewChild,
+} from '@angular/core';
 import { PianoComponent } from './components/piano/piano.component';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [CommonModule, PianoComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [PianoComponent],
 })
 export class AppComponent {
   title = 'piancy';

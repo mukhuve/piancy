@@ -18,11 +18,12 @@
 <section
   class="flex flex-row gap-[3px] rounded-md shadow-inner pt-0 p-2 pb-3 bg-[#000] bg-opacity-20 overflow-hidden border-[0.1rem] border-gold-regular border-opacity-10 dark:border-opacity-20"
 >
-  <app-tile
-    *ngFor="let tile of tiles"
-    [tile]="tile"
-    class="dark:bg-black dark:bg-opacity-40 dark:text-white"
-    (actived)="actived(tile, $event)"
-  >
-  </app-tile>
+  @for (tile of tiles; track tile.note) {
+    <app-tile
+      [tile]="tile"
+      class="dark:bg-black dark:bg-opacity-40 dark:text-white"
+      (actived)="actived(tile, $event)"
+    >
+    </app-tile>
+  }
 </section>

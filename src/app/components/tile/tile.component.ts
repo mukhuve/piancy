@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   HostBinding,
@@ -11,9 +12,9 @@ import { Tile } from './tile';
 
 @Component({
   selector: 'app-tile',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './tile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tile.component.scss'],
 })
 export class TileComponent {
@@ -40,7 +41,7 @@ export class TileComponent {
   @HostListener('window:mousedown', ['$event'])
   @HostListener('window:mouseup', ['$event'])
   @HostListener('window:touchend', ['$event'])
-  press(event: MouseEvent) {
+  press(event: Event) {
     this.pressed = event.type === 'mousedown';
   }
 
@@ -50,7 +51,7 @@ export class TileComponent {
   @HostListener('mouseenter', ['$event'])
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
-  touch(event: KeyboardEvent | (MouseEvent & TouchEvent)) {
+  touch(event: KeyboardEvent | MouseEvent | TouchEvent) {
     const active =
       !!event.type.match(/start|down/) ||
       (!!event.type.match(/enter/) && this.pressed);
