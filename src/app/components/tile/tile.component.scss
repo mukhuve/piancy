@@ -32,8 +32,6 @@
   }
 }
 
-/* El modo oscuro de la tecla vive aqui y no como clases `dark:` en el
-   <app-tile> del piano: el estilo de la tecla es cosa de la tecla. */
 :host-context(.dark) {
   &:not(.active) {
     @apply bg-black/40 text-white/70 hover:text-white;

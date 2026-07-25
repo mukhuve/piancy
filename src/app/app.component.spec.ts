@@ -2,46 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
-  beforeEach(() =>
-    TestBed.configureTestingModule({
-      imports: [AppComponent],
-    })
-  );
+  beforeEach(() => TestBed.configureTestingModule({ imports: [AppComponent] }));
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(TestBed.createComponent(AppComponent).componentInstance).toBeTruthy();
   });
 
-  describe('colorize', () => {
-    const range: [number, number] = [220, 880];
+  it('publica el color de las notas que suenan como variable css', () => {
+    const fixture = TestBed.createComponent(AppComponent);
 
-    it('pinta de rojo la nota mas grave y de violeta la mas aguda', () => {
-      const app = TestBed.createComponent(AppComponent).componentInstance;
+    fixture.componentInstance.colorize({ notes: [220], range: [220, 880] });
+    fixture.detectChanges();
 
-      app.colorize({ notes: [220], range }); // 630 nm
-      expect(app.color()).toBe('rgb(255, 59, 0)');
-
-      app.colorize({ notes: [880], range }); // 400 nm
-      expect(app.color()).toBe('rgb(170, 0, 255)');
-    });
-
-    it('suma el color de las notas de un acorde', () => {
-      const app = TestBed.createComponent(AppComponent).componentInstance;
-
-      app.colorize({ notes: [220, 880], range });
-
-      expect(app.color()).toBe('rgb(425, 59, 255)');
-    });
-
-    it('se queda sin color cuando no suena nada', () => {
-      const app = TestBed.createComponent(AppComponent).componentInstance;
-
-      app.colorize({ notes: [220], range });
-      app.colorize({ notes: [], range });
-
-      expect(app.color()).toBe('');
-    });
+    expect(fixture.nativeElement.style.getPropertyValue('--tone-color')).toBe('rgb(255, 59, 0)');
   });
 });

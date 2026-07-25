@@ -1,5 +1,4 @@
-import { PIANO_KEYS } from '../components/piano/piano.constants';
-import { chromaticMinor } from './scales';
+import { PIANO_KEYS, chromaticMinor } from './scales';
 
 describe('chromaticMinor', () => {
   it('afina por temperamento igual desde A0 = 27.5 Hz', () => {

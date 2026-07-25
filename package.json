@@ -11,17 +11,12 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^22.0.8",
     "@angular/common": "^22.0.8",
     "@angular/compiler": "^22.0.8",
     "@angular/core": "^22.0.8",
-    "@angular/forms": "^22.0.8",
     "@angular/platform-browser": "^22.0.8",
-    "@angular/platform-browser-dynamic": "^22.0.8",
-    "@angular/router": "^22.0.8",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.1"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular-eslint/builder": "22.1.0",
@@ -32,14 +27,13 @@
     "@tailwindcss/postcss": "^4.3.3",
     "angular-cli-ghpages": "^3.1.0",
     "angular-eslint": "22.1.0",
-    "autoprefixer": "^10.4.14",
     "eslint": "^10.6.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jsdom": "^29.1.1",
-    "postcss": "^8.4.26",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
-    "typescript-eslint": "8.62.1",
-    "vitest": "^4.0.8"
+    "typescript-eslint": "8.65.0",
+    "vitest": "^4.0.8",
+    "zone.js": "^0.16.2"
   }
 }

@@ -1,11 +1,4 @@
-import { provideZoneChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
-import { config } from './app/app.config';
 
-// enable prod
-
-bootstrapApplication(AppComponent, {
-  ...config,
-  providers: [provideZoneChangeDetection(), ...config.providers],
-}).catch((err) => console.error(err));
+bootstrapApplication(AppComponent).catch((err) => console.error(err));

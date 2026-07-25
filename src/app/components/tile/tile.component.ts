@@ -32,57 +32,49 @@ export class TileComponent {
   private oscillator?: OscillatorNode;
   private pressed = false;
 
+  /** El raton arrastrado sobre el teclado toca; hay que saber si el boton sigue abajo. */
   press(event: Event) {
     this.pressed = event.type === 'mousedown';
   }
 
   touch(event: KeyboardEvent | MouseEvent | TouchEvent) {
-    const active =
-      !!event.type.match(/start|down/) ||
-      (!!event.type.match(/enter/) && this.pressed);
-
-    if (
-      event instanceof KeyboardEvent &&
-      (event.key !== this.tile().key || event.ctrlKey)
-    ) {
+    if (event instanceof KeyboardEvent && (event.key !== this.tile().key || event.ctrlKey)) {
       return;
     }
 
-    this.push(active);
+    const start = /start|down/.test(event.type);
+    const entering = /enter/.test(event.type) && this.pressed;
+
+    this.push(start || entering);
   }
 
-  sound(active: boolean) {
+  push(active = true) {
     if (active === this.active()) return;
+
     if (active) {
-      this.ctx ??= new AudioContext();
-      if (!this.oscillator) {
-        this.oscillator = this.ctx.createOscillator();
-        this.oscillator.frequency.value = this.tile().frequency;
-        // this.oscillator.type = 'sine';
-        // this.oscillator.type = 'square';
-        this.oscillator.type = 'triangle';
-        // this.oscillator.type = 'sawtooth';
-        // this.oscillator.setPeriodicWave(
-        //   this.ctx.createPeriodicWave(
-        //     new Float32Array([0, 0.2, 0.4, 0.6, 0.8, 1]),
-        //     new Float32Array([0, 0, 0, 0, 0, 0]),
-        //     // { disableNormalization: true }
-        //   )
-        // );
-
-        this.oscillator.start();
-      }
-
-      this.oscillator.connect(this.ctx.destination);
-    } else if (this.oscillator && this.ctx) {
-      this.oscillator.disconnect(this.ctx.destination);
+      this.connect();
+    } else {
+      this.oscillator?.disconnect();
     }
 
     this.active.set(active);
     this.actived.emit(active);
   }
 
-  push(active = true) {
-    this.sound(active);
+  /**
+   * Un OscillatorNode no se puede reiniciar tras `stop()`, asi que se crea una sola
+   * vez y suena o calla conectandose y desconectandose del destino.
+   */
+  private connect() {
+    this.ctx ??= new AudioContext();
+
+    if (!this.oscillator) {
+      this.oscillator = this.ctx.createOscillator();
+      this.oscillator.frequency.value = this.tile().frequency;
+      this.oscillator.type = 'triangle';
+      this.oscillator.start();
+    }
+
+    this.oscillator.connect(this.ctx.destination);
   }
 }

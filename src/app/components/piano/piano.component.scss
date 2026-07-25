@@ -7,7 +7,6 @@
   user-select: none;
 }
 
-/* igual que en tile: el estilo oscuro del piano vive con el piano */
 :host-context(.dark) {
   @apply bg-stone-700;
 }
