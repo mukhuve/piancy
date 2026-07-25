@@ -1,8 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* el modo oscuro se activa con la clase .dark en <html> */
+@custom-variant dark (.dark &);
+
+@theme {
+  --color-white: #fffbeb;
+  --color-black: #393e41;
+  --color-gold-regular: #ffd52e;
+  --color-gold-light: #efe0a4;
+  --color-gold-dark: #d1a700;
+  --color-green: #4caf50;
+  --color-red: #f44336;
+}
 
 body {
   @apply bg-gray-100 flex flex-row items-center justify-center dark:bg-black dark:text-white;

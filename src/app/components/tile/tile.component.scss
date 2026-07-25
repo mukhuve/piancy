@@ -1,7 +1,9 @@
+@reference "../../../styles.css";
+
 :host {
   @apply relative flex flex-col items-center justify-end p-2 w-12 h-32 transition-all duration-75 ease-out;
-  @apply border-none bg-white text-black shadow-lg font-bold cursor-pointer overflow-hidden;
-  @apply text-opacity-70 hover:text-opacity-100;
+  @apply border-none bg-white shadow-lg font-bold cursor-pointer overflow-hidden;
+  @apply text-black/70 hover:text-black;
 
   border-radius: 0 0 0.25rem 0.25rem;
   user-select: none;
@@ -12,14 +14,14 @@
   }
 
   .key {
-    @apply w-6 h-6 rounded-sm flex items-center justify-center text-xs;
-    @apply pointer-events-none bg-stone-900 bg-opacity-30 text-inherit;
+    @apply w-6 h-6 rounded-xs flex items-center justify-center text-xs;
+    @apply pointer-events-none bg-stone-900/30 text-inherit;
   }
 }
 
 :host[sharp="true"] {
-  @apply w-6 h-[5rem] bg-stone-700 text-white z-10 items-center p-0 shadow-sm pb-2;
-  @apply text-opacity-70 hover:text-opacity-100;
+  @apply w-6 h-[5rem] bg-stone-700 z-10 items-center p-0 shadow-xs pb-2;
+  @apply text-white/70 hover:text-white;
 
   margin-left: -0.9rem;
   margin-right: -0.8rem;
@@ -30,13 +32,15 @@
   }
 }
 
-:is(.dark) {
-  :host:not(.active) {
-    @apply text-opacity-70 hover:text-opacity-100;
+/* El modo oscuro de la tecla vive aqui y no como clases `dark:` en el
+   <app-tile> del piano: el estilo de la tecla es cosa de la tecla. */
+:host-context(.dark) {
+  &:not(.active) {
+    @apply bg-black/40 text-white/70 hover:text-white;
   }
-  :host[sharp="true"]:not(.active) {
-    @apply bg-gold-light text-stone-700;
-    @apply text-opacity-70 hover:text-opacity-100;
+
+  &[sharp="true"]:not(.active) {
+    @apply bg-gold-light text-stone-700/70 hover:text-stone-700;
   }
 }
 
