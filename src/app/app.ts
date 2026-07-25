@@ -1,17 +1,17 @@
 import { Component, signal } from '@angular/core';
-import { PianoComponent, PianoNotes } from './components/piano/piano.component';
+import { Piano, PianoNotes } from './components/piano/piano';
 import { notesToColor } from './helpers/colors';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  imports: [PianoComponent],
+  templateUrl: './app.html',
+  styleUrls: ['./app.scss'],
+  imports: [Piano],
   host: {
     '[style.--tone-color]': 'color()',
   },
 })
-export class AppComponent {
+export class App {
   readonly color = signal('');
   readonly darkmode = signal(false);
 

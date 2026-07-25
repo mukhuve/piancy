@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { Note } from '../../helpers/note';
 import { Tile } from './tile';
-import { TileComponent } from './tile.component';
 
 /** jsdom no trae Web Audio API: lo minimo para que la tecla pueda sonar. */
 class FakeOscillator {
@@ -19,17 +19,17 @@ class FakeAudioContext {
   }
 }
 
-describe('TileComponent', () => {
-  let component: TileComponent;
-  let fixture: ComponentFixture<TileComponent>;
+describe('Tile', () => {
+  let component: Tile;
+  let fixture: ComponentFixture<Tile>;
 
   beforeEach(() => {
     vi.stubGlobal('AudioContext', FakeAudioContext);
     TestBed.configureTestingModule({
-      imports: [TileComponent],
+      imports: [Tile],
     });
-    fixture = TestBed.createComponent(TileComponent);
-    fixture.componentRef.setInput('tile', new Tile('A4', 440, 'q'));
+    fixture = TestBed.createComponent(Tile);
+    fixture.componentRef.setInput('note', new Note('A4', 440, 'q'));
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

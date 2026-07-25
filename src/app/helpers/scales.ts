@@ -1,4 +1,4 @@
-import { Tile } from '../components/tile/tile';
+import { Note } from './note';
 
 const A0 = 27.5; // Hz, la nota mas grave de un piano
 const SEMITONE = 2 ** (1 / 12); // temperamento igual
@@ -13,24 +13,24 @@ export const PIANO_KEYS = [
 ];
 
 /**
- * Teclas de `octaves` octavas cromaticas a partir de la octava `base`. Las teclas
+ * Notas de `octaves` octavas cromaticas a partir de la octava `base`. Las teclas
  * del ordenador se reparten por posicion, asi que sobran notas si se piden muchas
  * octavas: esas se quedan sin atajo.
  */
 export function chromaticMinor(base = 3, octaves = 2) {
-  const tiles: Tile[] = [];
+  const notes: Note[] = [];
 
   for (let octave = base; octave < base + octaves; octave++) {
     const keyBase = (octave - base) * CHROMATIC_SCALE.length;
 
-    CHROMATIC_SCALE.forEach((name, i) => {
+    CHROMATIC_SCALE.forEach((step, i) => {
       const frequency = A0 * 2 ** octave * SEMITONE ** i;
-      const noteOctave = name >= 'C' ? octave + 1 : octave; // la octava cambia en el do
+      const noteOctave = step >= 'C' ? octave + 1 : octave; // la octava cambia en el do
       const key = PIANO_KEYS[keyBase + i] ?? '';
 
-      tiles.push(new Tile(`${name}${noteOctave}`, frequency, key));
+      notes.push(new Note(`${step}${noteOctave}`, frequency, key));
     });
   }
 
-  return tiles;
+  return notes;
 }

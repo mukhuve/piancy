@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { App } from './app';
 
-describe('AppComponent', () => {
-  beforeEach(() => TestBed.configureTestingModule({ imports: [AppComponent] }));
+describe('App', () => {
+  beforeEach(() => TestBed.configureTestingModule({ imports: [App] }));
 
   it('should create the app', () => {
-    expect(TestBed.createComponent(AppComponent).componentInstance).toBeTruthy();
+    expect(TestBed.createComponent(App).componentInstance).toBeTruthy();
   });
 
   it('publica el color de las notas que suenan como variable css', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+    const fixture = TestBed.createComponent(App);
 
     fixture.componentInstance.colorize({ notes: [220], range: [220, 880] });
     fixture.detectChanges();

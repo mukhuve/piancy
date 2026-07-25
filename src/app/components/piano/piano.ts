@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal, viewChildren } from '@angular/core';
+import { Note } from '../../helpers/note';
 import { chromaticMinor } from '../../helpers/scales';
 import { Tile } from '../tile/tile';
-import { TileComponent } from '../tile/tile.component';
 
 /** Notas sonando ahora y el rango de frecuencias del teclado que las produce. */
 export interface PianoNotes {
@@ -19,33 +19,33 @@ const REST = 10; // ms de silencio entre notas, para que se distingan las repeti
 
 @Component({
   selector: 'app-piano',
-  imports: [TileComponent],
-  templateUrl: './piano.component.html',
-  styleUrls: ['./piano.component.scss'],
+  imports: [Tile],
+  templateUrl: './piano.html',
+  styleUrls: ['./piano.scss'],
 })
-export class PianoComponent {
+export class Piano {
   readonly octaves = input(3);
   readonly base = input(3);
 
   readonly played = output<PianoNotes>();
 
-  readonly tiles = computed(() => chromaticMinor(this.base(), this.octaves()));
-  readonly notes = signal<number[]>([]);
-  readonly active = computed(() => this.notes().length > 0);
+  readonly notes = computed(() => chromaticMinor(this.base(), this.octaves()));
+  readonly playing = signal<number[]>([]);
+  readonly active = computed(() => this.playing().length > 0);
 
-  private readonly tileList = viewChildren(TileComponent);
+  private readonly tiles = viewChildren(Tile);
 
   private readonly range = computed<[number, number]>(() => {
-    const tiles = this.tiles();
+    const notes = this.notes();
 
-    return [tiles[0].frequency, tiles[tiles.length - 1].frequency];
+    return [notes[0].frequency, notes[notes.length - 1].frequency];
   });
 
-  actived({ frequency }: Tile, active: boolean) {
-    this.notes.update((notes) =>
-      active ? [...notes, frequency] : notes.filter((note) => note !== frequency)
+  actived({ frequency }: Note, active: boolean) {
+    this.playing.update((playing) =>
+      active ? [...playing, frequency] : playing.filter((note) => note !== frequency)
     );
-    this.played.emit({ notes: this.notes(), range: this.range() });
+    this.played.emit({ notes: this.playing(), range: this.range() });
   }
 
   async play() {
@@ -61,7 +61,7 @@ export class PianoComponent {
   /** Pulsa las teclas de una nota o acorde durante `duration` ms. */
   private async push(note: string, duration: number) {
     const chord = note.split('+');
-    const tiles = this.tileList().filter((tile) => chord.includes(tile.tile().note));
+    const tiles = this.tiles().filter((tile) => chord.includes(tile.note().name));
 
     tiles.forEach((tile) => tile.push(true));
     await wait(duration);
