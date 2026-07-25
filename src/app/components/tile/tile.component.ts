@@ -1,56 +1,41 @@
-import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  HostBinding,
-  HostListener,
-  Input,
-  Output,
-} from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { Component, input, output, signal } from '@angular/core';
 import { Tile } from './tile';
 
 @Component({
   selector: 'app-tile',
-  imports: [CommonModule],
+  imports: [DecimalPipe],
   templateUrl: './tile.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tile.component.scss'],
+  host: {
+    '[class.active]': 'active()',
+    '[attr.sharp]': 'tile().sharp',
+    '(window:touchstart)': 'press($event)',
+    '(window:touchend)': 'press($event)',
+    '(window:mousedown)': 'press($event)',
+    '(window:mouseup)': 'press($event)',
+    '(mousedown)': 'touch($event)',
+    '(mouseup)': 'touch($event)',
+    '(mouseout)': 'touch($event)',
+    '(mouseenter)': 'touch($event)',
+    '(window:keydown)': 'touch($event)',
+    '(window:keyup)': 'touch($event)',
+  },
 })
 export class TileComponent {
-  @Input()
-  tile!: Tile;
-  ctx!: AudioContext;
-  oscillator!: OscillatorNode;
+  readonly tile = input.required<Tile>();
+  readonly actived = output<boolean>();
 
-  name = '';
-  pressed = false;
+  readonly active = signal(false);
 
-  @HostBinding('class.active')
-  active = false;
+  private ctx?: AudioContext;
+  private oscillator?: OscillatorNode;
+  private pressed = false;
 
-  @Output()
-  actived = new EventEmitter<boolean>();
-
-  @HostBinding('attr.sharp')
-  get sharp() {
-    return this.tile.sharp;
-  }
-
-  @HostListener('window:touchstart', ['$event'])
-  @HostListener('window:mousedown', ['$event'])
-  @HostListener('window:mouseup', ['$event'])
-  @HostListener('window:touchend', ['$event'])
   press(event: Event) {
     this.pressed = event.type === 'mousedown';
   }
 
-  @HostListener('mousedown', ['$event'])
-  @HostListener('mouseup', ['$event'])
-  @HostListener('mouseout', ['$event'])
-  @HostListener('mouseenter', ['$event'])
-  @HostListener('window:keydown', ['$event'])
-  @HostListener('window:keyup', ['$event'])
   touch(event: KeyboardEvent | MouseEvent | TouchEvent) {
     const active =
       !!event.type.match(/start|down/) ||
@@ -58,7 +43,7 @@ export class TileComponent {
 
     if (
       event instanceof KeyboardEvent &&
-      (event.key !== this.tile.key || event.ctrlKey)
+      (event.key !== this.tile().key || event.ctrlKey)
     ) {
       return;
     }
@@ -67,14 +52,12 @@ export class TileComponent {
   }
 
   sound(active: boolean) {
-    if (active === this.active) return;
+    if (active === this.active()) return;
     if (active) {
-      if (!this.ctx) {
-        this.ctx = new AudioContext();
-      }
+      this.ctx ??= new AudioContext();
       if (!this.oscillator) {
         this.oscillator = this.ctx.createOscillator();
-        this.oscillator.frequency.value = this.tile.frequency;
+        this.oscillator.frequency.value = this.tile().frequency;
         // this.oscillator.type = 'sine';
         // this.oscillator.type = 'square';
         this.oscillator.type = 'triangle';
@@ -91,12 +74,12 @@ export class TileComponent {
       }
 
       this.oscillator.connect(this.ctx.destination);
-    } else if (this.oscillator) {
+    } else if (this.oscillator && this.ctx) {
       this.oscillator.disconnect(this.ctx.destination);
     }
 
-    this.active = active;
-    this.actived.emit(this.active);
+    this.active.set(active);
+    this.actived.emit(active);
   }
 
   push(active = true) {

@@ -11,7 +11,7 @@
     (click)="toggleDarkMode()"
   >
     <i class="material-icons-round">
-      {{ darkmode ? "wb_sunny" : "dark_mode" }}
+      {{ darkmode() ? "wb_sunny" : "dark_mode" }}
     </i>
   </button>
 </header>
@@ -20,6 +20,6 @@
   class="dark:bg-stone-700"
   [base]="3"
   [octaves]="4"
-  (output)="colorize($event)"
+  (played)="colorize($event)"
 ></app-piano>
-<div class="ind" [class.active]="piano?.active"></div>
+<div class="ind" [class.active]="piano.active()"></div>

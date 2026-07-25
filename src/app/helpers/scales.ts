@@ -27,7 +27,3 @@ export function chromaticMinor(base = 3, octaves = 2) {
 
   return frequencies;
 }
-
-export function chromaticMajor(base = 3, octaves = 2) {
-  // TODO: implement this function to return a chromatic major scale
-}

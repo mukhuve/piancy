@@ -1,26 +1,20 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  HostBinding,
-  ViewChild,
-} from '@angular/core';
-import { PianoComponent } from './components/piano/piano.component';
+import { Component, signal } from '@angular/core';
+import { PianoComponent, PianoNotes } from './components/piano/piano.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [PianoComponent],
+  host: {
+    '[style.--tone-color]': 'color()',
+  },
 })
 export class AppComponent {
   title = 'piancy';
 
-  @ViewChild(PianoComponent)
-  piano!: PianoComponent;
-
-  @HostBinding('style.--tone-color')
-  color = '';
+  readonly color = signal('');
+  readonly darkmode = signal(false);
 
   soundToLight(frequency: number, range: [number, number] = [220, 880]) {
     const [minSound, maxSound] = range; // [220, 880] Hz (sonido más grave y más agudo del piano)
@@ -74,33 +68,20 @@ export class AppComponent {
     return { r, g, b };
   }
 
-  colorize(event: any) {
-    const { piano, notes } = event;
-    const range = piano.frequencyRange as [number, number];
-    const colors = notes
-      .map((frequency: number) => this.soundToLight(frequency, range))
-      .map((light: number) => this.lightToRGB(light));
+  colorize({ notes, range }: PianoNotes) {
+    const rgb = notes
+      .map((frequency) => this.soundToLight(frequency, range))
+      .map((light) => this.lightToRGB(light))
+      .reduce(
+        (acc, { r, g, b }) => ({ r: acc.r + r, g: acc.g + g, b: acc.b + b }),
+        { r: 0, g: 0, b: 0 }
+      );
 
-    const rgb = colors.reduce(
-      (acc: any, color: any) => {
-        const { r, g, b } = color;
-        acc.r += r;
-        acc.g += g;
-        acc.b += b;
-        return acc;
-      },
-      { r: 0, g: 0, b: 0 }
-    );
-
-    if (rgb.r + rgb.g + rgb.b === 0) this.color = '';
-    else this.color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    const silent = rgb.r + rgb.g + rgb.b === 0;
+    this.color.set(silent ? '' : `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`);
   }
 
   toggleDarkMode() {
-    document.documentElement.classList.toggle('dark');
-  }
-
-  get darkmode() {
-    return document.documentElement.classList.contains('dark');
+    this.darkmode.set(document.documentElement.classList.toggle('dark'));
   }
 }
