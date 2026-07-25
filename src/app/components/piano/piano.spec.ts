@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TileComponent } from './tile.component';
+import { Piano } from './piano';
 
-describe('TileComponent', () => {
-  let component: TileComponent;
-  let fixture: ComponentFixture<TileComponent>;
+describe('Piano', () => {
+  let component: Piano;
+  let fixture: ComponentFixture<Piano>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [TileComponent]
+      imports: [Piano],
     });
-    fixture = TestBed.createComponent(TileComponent);
+    fixture = TestBed.createComponent(Piano);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

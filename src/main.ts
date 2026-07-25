@@ -1,7 +1,7 @@
+import { provideBrowserGlobalErrorListeners } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { AppComponent } from './app/app.component';
-import { config } from './app/app.config';
+import { App } from './app/app';
 
-// enable prod
-
-bootstrapApplication(AppComponent, config).catch((err) => console.error(err));
+bootstrapApplication(App, {
+  providers: [provideBrowserGlobalErrorListeners()],
+}).catch((err) => console.error(err));
