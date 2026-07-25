@@ -1,6 +1,6 @@
 # Piancy
 
-SUn piano simple para jugar construido con [Angular](https://angular.io/).
+Un piano simple para jugar construido con [Angular](https://angular.dev/).
 
 
 ![piancy](https://raw.githubusercontent.com/mukhuve/piancy/master/public/piancy.png)
