@@ -1,5 +1,6 @@
-const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const SEMITONES = NAMES.length;
+export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+const SEMITONES = NOTE_NAMES.length;
 const A4_MIDI = 69;
 const A4_HZ = 440;
 
@@ -35,7 +36,7 @@ export function octaveOf(midi: number) {
 }
 
 export function pitchOf(midi: number): Pitch {
-  const step = NAMES[pitchClassOf(midi)];
+  const step = NOTE_NAMES[pitchClassOf(midi)];
   const octave = octaveOf(midi);
 
   return {

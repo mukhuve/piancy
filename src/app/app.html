@@ -6,6 +6,21 @@
   <button
     class="btn btn-icon"
     type="button"
+    title="Sound and synthesis"
+    aria-label="Sound and synthesis"
+    [class.on]="panel()"
+    [attr.aria-pressed]="panel()"
+    (click)="panel.set(!panel())"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path d="M6 4v6M6 14v6M12 4v3M12 11v9M18 4v10M18 18v2"></path>
+      <path d="M4 12h4M10 9h4M16 16h4"></path>
+    </svg>
+  </button>
+
+  <button
+    class="btn btn-icon"
+    type="button"
     [attr.aria-label]="darkmode() ? 'Switch to light theme' : 'Switch to dark theme'"
     (click)="toggleDarkMode()"
   >
@@ -24,16 +39,24 @@
   </button>
 </header>
 
-<main class="blueprint stage">
-  <i class="corner tl"></i><i class="corner tr"></i>
-  <i class="corner bl"></i><i class="corner br"></i>
+<div class="body">
+  <main class="blueprint stage">
+    <i class="corner tl"></i><i class="corner tr"></i>
+    <i class="corner bl"></i><i class="corner br"></i>
 
-  @if (playing()) {
-    <span class="reading">{{ chord() }}</span>
-  } @else {
-    <h2>Press a key to start</h2>
-    <span class="label">Click the keyboard or type A W S E D F · space sustains</span>
+    <span class="reading label">{{ tonality.name() }}</span>
+
+    @if (playing()) {
+      <span class="chord-large">{{ chord() }}</span>
+    } @else {
+      <h2>Press a key to start</h2>
+      <span class="label">Click the keyboard or type A W S E D F · space sustains</span>
+    }
+  </main>
+
+  @if (panel()) {
+    <app-synth-panel></app-synth-panel>
   }
-</main>
+</div>
 
 <app-piano></app-piano>

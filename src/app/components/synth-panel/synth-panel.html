@@ -1,0 +1,95 @@
+<h2 class="label">Sound</h2>
+
+<div class="blueprint box">
+  <i class="corner tl"></i><i class="corner tr"></i>
+  <i class="corner bl"></i><i class="corner br"></i>
+
+  <div class="grid">
+    <label for="key-root">Key</label>
+    <select id="key-root" (change)="tonality.root.set(+$any($event.target).value)">
+      @for (note of notes; track note; let i = $index) {
+        <option [value]="i" [selected]="i === tonality.root()">{{ note }}</option>
+      }
+    </select>
+
+    <label for="key-scale">Scale</label>
+    <select id="key-scale" (change)="setMode($any($event.target).value)">
+      @for (mode of modes; track mode) {
+        <option [value]="mode" [selected]="mode === tonality.mode()">{{ mode }}</option>
+      }
+    </select>
+
+    <label for="preset">Preset</label>
+    <select id="preset" (change)="usePreset($any($event.target).value)">
+      @for (preset of presets; track preset) {
+        <option [value]="preset" [selected]="preset === synth.preset()">{{ preset }}</option>
+      }
+    </select>
+
+    <label for="master">Master</label>
+    <input
+      id="master"
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      [value]="synth.volume()"
+      (input)="synth.volume.set(+$any($event.target).value)"
+    />
+  </div>
+</div>
+
+<div class="section">
+  <h2 class="label">Synthesis Engine</h2>
+  <button type="button" class="fold-all" (click)="foldAll()">
+    {{ allFolded() ? "Expand all" : "Collapse all" }}
+  </button>
+</div>
+
+@for (group of groups; track group.title) {
+  <div class="blueprint box">
+    <i class="corner tl"></i><i class="corner tr"></i>
+    <i class="corner bl"></i><i class="corner br"></i>
+
+    <button
+      type="button"
+      class="head"
+      [class.folded]="!isOpen(group.title)"
+      [attr.aria-expanded]="isOpen(group.title)"
+      (click)="toggle(group.title)"
+    >
+      <span class="title">{{ group.title }}</span>
+      <span class="code">{{ group.code }}</span>
+    </button>
+
+    @if (isOpen(group.title)) {
+      <div class="grid rows">
+        @for (control of group.controls; track control.key) {
+          <label [for]="control.key">{{ control.label }}</label>
+
+          @if (control.options) {
+            <select [id]="control.key" (change)="set(control, $any($event.target).value)">
+              @for (option of control.options; track option.value) {
+                <option [value]="option.value" [selected]="option.value === valueOf(control)">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          } @else {
+            <input
+              [id]="control.key"
+              type="range"
+              [min]="control.min"
+              [max]="control.max"
+              [step]="control.step"
+              [value]="valueOf(control)"
+              (input)="set(control, $any($event.target).value)"
+            />
+          }
+
+          <span class="value">{{ display(control) }}</span>
+        }
+      </div>
+    }
+  </div>
+}

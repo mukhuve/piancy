@@ -1,4 +1,9 @@
 @if (key().shortcut) {
   <small class="shortcut">{{ key().shortcut }}</small>
 }
-<strong class="name">{{ key().black ? key().pitch.step : key().pitch.name }}</strong>
+@if (degree()) {
+  <strong class="degree">{{ degree() }}</strong>
+}
+@if (!key().black) {
+  <small class="name">{{ key().pitch.name }}</small>
+}

@@ -1,5 +1,6 @@
 import { Component, ElementRef, computed, inject, input, output } from '@angular/core';
 import { colorOf, toCss } from '../../music/color';
+import { Tonality } from '../../music/scales';
 import { Synth } from '../../synth/synth';
 import { PianoKey } from '../piano/piano';
 
@@ -11,6 +12,7 @@ import { PianoKey } from '../piano/piano';
     role: 'button',
     '[class.black]': 'key().black',
     '[class.active]': 'active()',
+    '[class.outside]': '!degree()',
     '[style.left.%]': 'key().x * 100',
     '[style.width.%]': 'key().width * 100',
     '[attr.aria-label]': 'key().pitch.name',
@@ -38,9 +40,11 @@ export class Tile {
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly synth = inject(Synth);
+  private readonly tonality = inject(Tonality);
 
   readonly active = computed(() => this.synth.playing().includes(this.key().pitch.midi));
   readonly color = computed(() => toCss(colorOf(this.key().pitch.midi)));
+  readonly degree = computed(() => this.tonality.label(this.key().pitch.midi));
 
   focus() {
     this.host.nativeElement.focus();

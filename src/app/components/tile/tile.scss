@@ -17,10 +17,21 @@
     letter-spacing: 0.08em;
   }
 
-  .name {
-    @apply font-heading text-sm;
+  .degree {
+    @apply font-heading text-base;
 
     letter-spacing: 0.04em;
+  }
+
+  .name {
+    @apply text-[10px];
+
+    letter-spacing: 0.1em;
+  }
+
+  /* las notas de fuera de la tonalidad pesan menos, pero se siguen leyendo */
+  &.outside .name {
+    @apply opacity-60;
   }
 
   &:hover {
@@ -42,7 +53,7 @@
     @apply w-3.5 h-3.5 text-[8px];
   }
 
-  .name {
+  .degree {
     @apply text-[11px];
   }
 

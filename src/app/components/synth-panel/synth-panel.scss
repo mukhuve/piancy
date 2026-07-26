@@ -1,0 +1,84 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply flex flex-col shrink-0 w-84 p-4 overflow-y-auto;
+  @apply bg-bg border-l border-divider;
+
+  .label {
+    @apply mb-3;
+  }
+
+  .section {
+    @apply flex items-baseline justify-between;
+
+    .label {
+      @apply mb-0;
+    }
+  }
+
+  .fold-all {
+    @apply font-heading text-[10px] uppercase text-accent-700 cursor-pointer bg-transparent border-none p-0;
+
+    letter-spacing: 0.14em;
+  }
+
+  .box {
+    @apply p-4 mb-3 bg-bg;
+  }
+
+  .head {
+    @apply flex items-baseline justify-between w-full mb-3 cursor-pointer;
+    @apply bg-transparent border-none p-0 text-left text-ink;
+
+    .title {
+      @apply font-heading text-sm uppercase;
+
+      letter-spacing: 0.14em;
+    }
+
+    .code {
+      @apply text-[10px] uppercase text-neutral-600;
+
+      letter-spacing: 0.12em;
+    }
+
+    &.folded {
+      @apply mb-0 opacity-60;
+    }
+  }
+
+  /* etiqueta · mando · lectura */
+  .grid {
+    @apply grid items-center gap-x-2 gap-y-2;
+
+    grid-template-columns: 4rem 1fr;
+
+    &.rows {
+      grid-template-columns: 4rem 1fr 2.9rem;
+    }
+  }
+
+  label {
+    @apply text-[10px] uppercase text-neutral-700;
+
+    letter-spacing: 0.1em;
+  }
+
+  .value {
+    @apply text-[11px] text-right text-neutral-700;
+
+    font-variant-numeric: tabular-nums;
+  }
+
+  select {
+    @apply w-full px-1.5 py-1 text-[13px] bg-bg text-ink border border-divider;
+
+    border-radius: 0;
+  }
+
+  input[type="range"] {
+    @apply w-full h-[18px];
+
+    accent-color: var(--color-accent-600);
+  }
+}

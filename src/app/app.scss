@@ -7,29 +7,42 @@
   --tone-color: transparent;
 
   > header {
-    @apply flex items-center gap-6 px-6 py-2 border-b border-divider shrink-0;
+    @apply flex items-center gap-2 px-6 py-2 border-b border-divider shrink-0;
 
     h1 {
-      @apply text-xl;
+      @apply text-xl mr-auto;
     }
 
     .chord {
-      @apply ml-auto font-heading text-sm uppercase text-accent-800 text-right;
+      @apply font-heading text-sm uppercase text-accent-800 text-right mr-2;
 
       letter-spacing: 0.12em;
       min-width: 5rem;
     }
+
+    .btn-icon.on {
+      @apply bg-accent-600 text-bg border-accent-600;
+    }
   }
 
-  > .stage {
-    @apply relative flex flex-col items-center justify-center gap-1 m-4 mb-0 flex-1 min-h-0;
+  > .body {
+    @apply flex flex-1 min-h-0;
+  }
+
+  .stage {
+    @apply relative flex flex-col flex-1 items-center justify-center gap-1 m-4 mb-0 min-w-0;
     @apply bg-neutral-100 overflow-hidden;
 
     h2 {
       @apply text-2xl text-accent-800;
     }
 
-    .reading {
+    /* lectura de la tonalidad, arriba a la izquierda del escenario */
+    > .reading {
+      @apply absolute top-2 left-3 pointer-events-none;
+    }
+
+    .chord-large {
       @apply font-heading text-5xl uppercase;
 
       color: var(--tone-color);
