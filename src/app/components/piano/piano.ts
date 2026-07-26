@@ -1,13 +1,8 @@
-import { Component, computed, input, output, signal, viewChildren } from '@angular/core';
-import { Note } from '../../helpers/note';
-import { chromaticMinor } from '../../helpers/scales';
+import { Component, computed, inject, input } from '@angular/core';
+import { PIANO_KEYS } from '../../input/computer-keys';
+import { pitchesBetween } from '../../music/pitch';
+import { Synth } from '../../synth/synth';
 import { Tile } from '../tile/tile';
-
-/** Notas sonando ahora y el rango de frecuencias del teclado que las produce. */
-export interface PianoNotes {
-  notes: number[];
-  range: [number, number];
-}
 
 /** Intro de Crazy Train. Formato `NOTA:segundos`, acordes con `+`. */
 const SONG = `
@@ -24,48 +19,38 @@ const REST = 10; // ms de silencio entre notas, para que se distingan las repeti
   styleUrls: ['./piano.scss'],
 })
 export class Piano {
-  readonly octaves = input(3);
-  readonly base = input(3);
+  /** Rango que se muestra, en MIDI: por defecto de A3 a G#7. */
+  readonly from = input(57);
+  readonly to = input(104);
 
-  readonly played = output<PianoNotes>();
+  private readonly synth = inject(Synth);
 
-  readonly notes = computed(() => chromaticMinor(this.base(), this.octaves()));
-  readonly playing = signal<number[]>([]);
-  readonly active = computed(() => this.playing().length > 0);
-
-  private readonly tiles = viewChildren(Tile);
-
-  private readonly range = computed<[number, number]>(() => {
-    const notes = this.notes();
-
-    return [notes[0].frequency, notes[notes.length - 1].frequency];
-  });
-
-  actived({ frequency }: Note, active: boolean) {
-    this.playing.update((playing) =>
-      active ? [...playing, frequency] : playing.filter((note) => note !== frequency)
-    );
-    this.played.emit({ notes: this.playing(), range: this.range() });
-  }
+  readonly keys = computed(() =>
+    pitchesBetween(this.from(), this.to()).map((pitch, i) => ({
+      pitch,
+      shortcut: PIANO_KEYS[i] ?? '',
+    }))
+  );
 
   async play() {
     for (const group of SONG.replace(/\s/g, '').split(',')) {
-      const [note, seconds] = group.split(':');
-      const duration = +seconds * 1000;
+      const [chord, seconds] = group.split(':');
 
-      await this.push(note, duration - REST);
+      await this.push(chord, +seconds * 1000 - REST);
       await wait(REST);
     }
   }
 
   /** Pulsa las teclas de una nota o acorde durante `duration` ms. */
-  private async push(note: string, duration: number) {
-    const chord = note.split('+');
-    const tiles = this.tiles().filter((tile) => chord.includes(tile.note().name));
+  private async push(chord: string, duration: number) {
+    const names = chord.split('+');
+    const midis = this.keys()
+      .filter(({ pitch }) => names.includes(pitch.name))
+      .map(({ pitch }) => pitch.midi);
 
-    tiles.forEach((tile) => tile.push(true));
+    midis.forEach((midi) => this.synth.noteOn(midi));
     await wait(duration);
-    tiles.forEach((tile) => tile.push(false));
+    midis.forEach((midi) => this.synth.noteOff(midi));
   }
 }
 

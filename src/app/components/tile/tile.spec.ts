@@ -1,27 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Note } from '../../helpers/note';
+import { pitchOf } from '../../music/pitch';
+import { FakeAudioContext } from '../../synth/audio-context.fake';
+import { Synth } from '../../synth/synth';
 import { Tile } from './tile';
-
-/** jsdom no trae Web Audio API: lo minimo para que la tecla pueda sonar. */
-class FakeOscillator {
-  frequency = { value: 0 };
-  type = '';
-  start = vi.fn();
-  connect = vi.fn();
-  disconnect = vi.fn();
-}
-
-class FakeAudioContext {
-  destination = {};
-  createOscillator() {
-    return new FakeOscillator();
-  }
-}
 
 describe('Tile', () => {
   let component: Tile;
   let fixture: ComponentFixture<Tile>;
+  let synth: Synth;
 
   beforeEach(() => {
     vi.stubGlobal('AudioContext', FakeAudioContext);
@@ -29,8 +16,10 @@ describe('Tile', () => {
       imports: [Tile],
     });
     fixture = TestBed.createComponent(Tile);
-    fixture.componentRef.setInput('note', new Note('A4', 440, 'q'));
+    fixture.componentRef.setInput('pitch', pitchOf(69));
+    fixture.componentRef.setInput('shortcut', 'q');
     component = fixture.componentInstance;
+    synth = TestBed.inject(Synth);
     fixture.detectChanges();
   });
 
@@ -38,19 +27,16 @@ describe('Tile', () => {
     expect(component).toBeTruthy();
   });
 
-  it('marca la tecla como activa y avisa al pulsarla', () => {
-    const avisos: boolean[] = [];
-    component.actived.subscribe((active) => avisos.push(active));
-
+  it('hace sonar su nota mientras esta pulsada', () => {
     component.push(true);
     fixture.detectChanges();
-    expect(component.active()).toBe(true);
+    expect(synth.playing()).toEqual([69]);
     expect(fixture.nativeElement.classList).toContain('active');
 
     component.push(false);
     fixture.detectChanges();
-    expect(component.active()).toBe(false);
-    expect(avisos).toEqual([true, false]);
+    expect(synth.playing()).toEqual([]);
+    expect(fixture.nativeElement.classList).not.toContain('active');
   });
 
   it('ignora las teclas del teclado que no son la suya', () => {

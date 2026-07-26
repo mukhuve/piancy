@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, input, output, signal } from '@angular/core';
-import { Note } from '../../helpers/note';
+import { Component, computed, inject, input } from '@angular/core';
+import { Pitch } from '../../music/pitch';
+import { Synth } from '../../synth/synth';
 
 @Component({
   selector: 'app-tile',
@@ -9,7 +10,7 @@ import { Note } from '../../helpers/note';
   styleUrls: ['./tile.scss'],
   host: {
     '[class.active]': 'active()',
-    '[attr.sharp]': 'note().sharp',
+    '[attr.sharp]': 'pitch().sharp',
     '(window:touchstart)': 'press($event)',
     '(window:touchend)': 'press($event)',
     '(window:mousedown)': 'press($event)',
@@ -23,13 +24,13 @@ import { Note } from '../../helpers/note';
   },
 })
 export class Tile {
-  readonly note = input.required<Note>();
-  readonly actived = output<boolean>();
+  readonly pitch = input.required<Pitch>();
+  readonly shortcut = input('');
 
-  readonly active = signal(false);
+  private readonly synth = inject(Synth);
 
-  private ctx?: AudioContext;
-  private oscillator?: OscillatorNode;
+  readonly active = computed(() => this.synth.playing().includes(this.pitch().midi));
+
   private pressed = false;
 
   /** El raton arrastrado sobre el teclado toca; hay que saber si el boton sigue abajo. */
@@ -38,7 +39,7 @@ export class Tile {
   }
 
   touch(event: KeyboardEvent | MouseEvent | TouchEvent) {
-    if (event instanceof KeyboardEvent && (event.key !== this.note().key || event.ctrlKey)) {
+    if (event instanceof KeyboardEvent && (event.key !== this.shortcut() || event.ctrlKey)) {
       return;
     }
 
@@ -51,30 +52,12 @@ export class Tile {
   push(active = true) {
     if (active === this.active()) return;
 
+    const { midi } = this.pitch();
+
     if (active) {
-      this.connect();
+      this.synth.noteOn(midi);
     } else {
-      this.oscillator?.disconnect();
+      this.synth.noteOff(midi);
     }
-
-    this.active.set(active);
-    this.actived.emit(active);
-  }
-
-  /**
-   * Un OscillatorNode no se puede reiniciar tras `stop()`, asi que se crea una sola
-   * vez y suena o calla conectandose y desconectandose del destino.
-   */
-  private connect() {
-    this.ctx ??= new AudioContext();
-
-    if (!this.oscillator) {
-      this.oscillator = this.ctx.createOscillator();
-      this.oscillator.frequency.value = this.note().frequency;
-      this.oscillator.type = 'triangle';
-      this.oscillator.start();
-    }
-
-    this.oscillator.connect(this.ctx.destination);
   }
 }

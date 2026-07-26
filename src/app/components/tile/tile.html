@@ -1,11 +1,11 @@
 <strong>
-  {{ note().label }}
+  {{ pitch().sharp ? "#" : pitch().name }}
 </strong>
-@if (!note().sharp) {
+@if (!pitch().sharp) {
   <small class="text-black text-[0.5rem] pointer-events-none mb-1 dark:text-gold-light">
-    {{ note().frequency | number : "1.1-1" }}
+    {{ pitch().frequency | number : "1.1-1" }}
   </small>
 }
 <small class="key">
-  {{ note().key || "×" }}
+  {{ shortcut() || "×" }}
 </small>

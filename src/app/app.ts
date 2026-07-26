@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { Piano, PianoNotes } from './components/piano/piano';
-import { notesToColor } from './helpers/colors';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Piano } from './components/piano/piano';
+import { chordColor } from './music/color';
+import { Synth } from './synth/synth';
 
 @Component({
   selector: 'app-root',
@@ -12,12 +13,11 @@ import { notesToColor } from './helpers/colors';
   },
 })
 export class App {
-  readonly color = signal('');
-  readonly darkmode = signal(false);
+  private readonly synth = inject(Synth);
 
-  colorize({ notes, range }: PianoNotes) {
-    this.color.set(notesToColor(notes, range));
-  }
+  readonly color = computed(() => chordColor(this.synth.playing()));
+  readonly playing = computed(() => this.synth.playing().length > 0);
+  readonly darkmode = signal(false);
 
   toggleDarkMode() {
     this.darkmode.set(document.documentElement.classList.toggle('dark'));

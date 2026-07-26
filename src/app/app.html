@@ -15,10 +15,5 @@
     </i>
   </button>
 </header>
-<app-piano
-  #piano
-  [base]="3"
-  [octaves]="4"
-  (played)="colorize($event)"
-></app-piano>
-<div class="ind" [class.active]="piano.active()"></div>
+<app-piano></app-piano>
+<div class="ind" [class.active]="playing()"></div>
