@@ -34,7 +34,6 @@ export class App {
 
   readonly color = computed(() => chordColor(this.synth.playing()));
   readonly chord = computed(() => chordName(this.synth.playing()));
-  readonly playing = computed(() => this.synth.playing().length > 0);
   readonly darkmode = signal(false);
   readonly panel = signal(false);
   readonly menu = signal(false);

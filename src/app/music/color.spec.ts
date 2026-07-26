@@ -40,6 +40,21 @@ describe('color', () => {
   it('ilumina mas un acorde que una nota suelta, y nada si no suena nada', () => {
     expect(chordColor([])).toBe('');
     expect(chordColor([60])).toBe('rgb(0, 255, 184)');
-    expect(chordColor([60, 64, 67])).toBe('rgb(354, 418, 439)');
+  });
+
+  it('el color de un acorde siempre cabe en el canal, o CSS no lo pinta', () => {
+    const canales = (color: string) => color.match(/\d+/g)!.map(Number);
+
+    [
+      [60, 64, 67],
+      [48, 52, 55, 60, 64, 67, 72],
+      Array.from({ length: 12 }, (_, i) => 60 + i),
+    ].forEach((acorde) => {
+      expect(canales(chordColor(acorde)).every((canal) => canal >= 0 && canal <= 255)).toBe(true);
+    });
+
+    // y un acorde sigue siendo mas luminoso que cualquiera de sus notas
+    const suma = (color: string) => canales(color).reduce((a, b) => a + b, 0);
+    expect(suma(chordColor([60, 64, 67]))).toBeGreaterThan(suma(chordColor([60])));
   });
 });

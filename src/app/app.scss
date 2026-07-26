@@ -11,6 +11,15 @@
 
     z-index: 30;
 
+    /* el color de lo que suena, en la linea que cierra la cabecera */
+    &::after {
+      @apply absolute inset-x-0 -bottom-px h-0.5 pointer-events-none;
+
+      content: "";
+      background: var(--tone-color);
+      transition: background 120ms linear;
+    }
+
     h1 {
       @apply text-xl;
     }

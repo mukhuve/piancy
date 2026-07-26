@@ -62,15 +62,24 @@ export function toCss({ r, g, b }: Rgb) {
 }
 
 /**
- * Color de lo que suena ahora. Los canales se suman sin recortar, de modo que un
- * acorde ilumina mas que una nota suelta. Cadena vacia si no suena nada.
+ * Color de lo que suena ahora: los canales se suman, de modo que un acorde ilumina
+ * mas que una nota suelta, y la mezcla se reescala entera para que quepa en el
+ * canal. Escalar en vez de recortar conserva el tono —un acorde queda claro, no
+ * blanco— y sobre todo devuelve siempre un color valido: sumar sin mas se sale de
+ * 255 en cuanto hay dos notas, y CSS descarta ese color y no pinta nada.
  */
 export function chordColor(midis: number[]) {
   if (!midis.length) return '';
 
-  const { r, g, b } = midis
+  const sum = midis
     .map(colorOf)
     .reduce((total, rgb) => ({ r: total.r + rgb.r, g: total.g + rgb.g, b: total.b + rgb.b }));
 
-  return toCss({ r, g, b });
+  const scale = 255 / Math.max(sum.r, sum.g, sum.b, 255);
+
+  return toCss({
+    r: Math.round(sum.r * scale),
+    g: Math.round(sum.g * scale),
+    b: Math.round(sum.b * scale),
+  });
 }
