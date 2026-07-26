@@ -10,4 +10,8 @@ export class Settings {
   readonly hints = signal(true);
   /** Barra del transporte al pie. */
   readonly transport = signal(true);
+  /** Teclas del ordenador escritas sobre las del piano. */
+  readonly typing = signal(true);
+  /** Espectro de fondo en el visualizador. */
+  readonly spectrum = signal(true);
 }

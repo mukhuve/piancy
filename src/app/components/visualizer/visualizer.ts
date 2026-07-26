@@ -1,6 +1,7 @@
 import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { animate, fit, themeReader } from '../../canvas/paint';
 import { Tonality } from '../../music/scales';
+import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
 import { drawGrid, drawSpectrum, drawVoices, drawWave } from './visualizer.paint';
 
@@ -18,6 +19,8 @@ export class Visualizer {
   private readonly palette = themeReader(this.host.nativeElement, COLORS);
 
   protected readonly tonality = inject(Tonality);
+
+  private readonly settings = inject(Settings);
   protected readonly playing = computed(() => this.synth.playing().length > 0);
 
   /** La ayuda de arranque se retira en cuanto se toca algo, y no vuelve. */
@@ -43,7 +46,9 @@ export class Visualizer {
       const notes = this.synth.playing();
 
       drawGrid(canvas, colors['neutral-300']);
-      drawSpectrum(canvas, this.synth.spectrum(), colors['accent-300']);
+      if (this.settings.spectrum()) {
+        drawSpectrum(canvas, this.synth.spectrum(), colors['accent-300']);
+      }
       drawVoices(canvas, notes);
       drawWave(canvas, this.synth.waveform(), notes, colors['accent-800']);
     });

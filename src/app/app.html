@@ -73,6 +73,23 @@
   <button
     class="btn btn-icon"
     type="button"
+    title="App settings"
+    aria-label="App settings"
+    [class.on]="menu()"
+    [attr.aria-expanded]="menu()"
+    (click)="menu.set(!menu())"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path
+        d="M12 3v2.5M12 18.5V21M4.2 7.5l2.2 1.3M17.6 15.2l2.2 1.3M4.2 16.5l2.2-1.3M17.6 8.8l2.2-1.3"
+      ></path>
+    </svg>
+  </button>
+
+  <button
+    class="btn btn-icon"
+    type="button"
     [attr.aria-label]="darkmode() ? 'Switch to light theme' : 'Switch to dark theme'"
     (click)="toggleDarkMode()"
   >
@@ -89,6 +106,10 @@
       </svg>
     }
   </button>
+
+  @if (menu()) {
+    <app-settings-menu (closed)="menu.set(false)"></app-settings-menu>
+  }
 </header>
 
 <div class="body">

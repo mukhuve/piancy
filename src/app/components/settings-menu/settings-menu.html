@@ -1,0 +1,32 @@
+<button class="backdrop" type="button" aria-label="Close settings" (click)="closed.emit()"></button>
+
+<div class="blueprint menu">
+  <i class="corner tl"></i><i class="corner tr"></i>
+  <i class="corner bl"></i><i class="corner br"></i>
+
+  <span class="label">App settings</span>
+
+  @for (toggle of toggles; track toggle.label) {
+    <button
+      class="item"
+      type="button"
+      [class.on]="toggle.state()"
+      [attr.aria-pressed]="toggle.state()"
+      (click)="toggle.state.set(!toggle.state())"
+    >
+      <span>{{ toggle.label }}</span>
+      <span class="state">{{ toggle.state() ? "On" : "Off" }}</span>
+    </button>
+  }
+
+  <button class="btn" type="button" (click)="resetProgress()">Reset lesson progress</button>
+
+  <div class="midi">
+    <span class="dot" [class.on]="midi.connected()"></span>
+    <span class="label">{{ midi.status() }}</span>
+
+    @if (midi.available()) {
+      <button class="link" type="button" (click)="midi.connect()">Connect</button>
+    }
+  </div>
+</div>

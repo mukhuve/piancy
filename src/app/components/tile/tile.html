@@ -1,4 +1,4 @@
-@if (key().shortcut) {
+@if (settings.typing() && key().shortcut) {
   <small class="shortcut">{{ key().shortcut }}</small>
 }
 @if (settings.hints() && degree()) {

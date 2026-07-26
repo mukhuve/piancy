@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Piano } from './components/piano/piano';
+import { SettingsMenu } from './components/settings-menu/settings-menu';
 import { SynthPanel } from './components/synth-panel/synth-panel';
 import { Lane } from './components/lane/lane';
 import { Lesson } from './components/lesson/lesson';
@@ -15,7 +16,7 @@ import { Synth } from './synth/synth';
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
-  imports: [Lane, Lesson, Piano, SynthPanel, Transport, Visualizer],
+  imports: [Lane, Lesson, Piano, SettingsMenu, SynthPanel, Transport, Visualizer],
   host: {
     '[style.--tone-color]': 'color()',
   },
@@ -36,6 +37,7 @@ export class App {
   readonly playing = computed(() => this.synth.playing().length > 0);
   readonly darkmode = signal(false);
   readonly panel = signal(false);
+  readonly menu = signal(false);
 
   toggleDarkMode() {
     this.darkmode.set(document.documentElement.classList.toggle('dark'));
