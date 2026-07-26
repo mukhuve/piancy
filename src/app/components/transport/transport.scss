@@ -22,6 +22,25 @@
     font-variant-numeric: tabular-nums;
   }
 
+  select {
+    @apply h-9 px-1.5 text-[13px] bg-bg text-ink border border-divider;
+
+    border-radius: 0;
+    min-width: 9rem;
+  }
+
+  input[type="range"] {
+    @apply w-24;
+
+    accent-color: var(--color-accent-600);
+  }
+
+  .figure {
+    @apply font-heading text-base w-11;
+
+    font-variant-numeric: tabular-nums;
+  }
+
   .pill {
     @apply inline-flex items-center h-9 px-3 font-heading text-[11px] uppercase;
     @apply border border-divider text-neutral-700;

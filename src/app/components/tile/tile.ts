@@ -1,9 +1,9 @@
 import { Component, ElementRef, computed, inject, input, output } from '@angular/core';
+import { PianoKey } from '../../keyboard/keyboard';
 import { colorOf, toCss } from '../../music/color';
 import { Tonality } from '../../music/scales';
 import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
-import { PianoKey } from '../piano/piano';
 
 @Component({
   selector: 'app-tile',

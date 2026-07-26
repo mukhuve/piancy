@@ -1,4 +1,38 @@
 <div class="group">
+  <label class="label" for="track">Track</label>
+  <select id="track" (change)="choose($any($event.target).value)">
+    <option value="" [selected]="!player.song()">None</option>
+    @for (song of player.songs; track song.name) {
+      <option [value]="song.name" [selected]="song === player.song()">
+        {{ song.name }} · {{ song.bpm }}
+      </option>
+    }
+  </select>
+
+  @if (player.song()) {
+    <button class="btn btn-primary" type="button" (click)="toggle()">
+      {{ player.running() ? "Stop" : player.countdown() || "Start" }}
+    </button>
+  }
+</div>
+
+@if (player.song()) {
+  <div class="group">
+    <label class="label" for="speed">Speed</label>
+    <input
+      id="speed"
+      type="range"
+      min="0.5"
+      max="1"
+      step="0.05"
+      [value]="player.speed()"
+      (input)="player.speed.set(+$any($event.target).value)"
+    />
+    <span class="figure">{{ (player.speed() * 100).toFixed(0) }}%</span>
+  </div>
+}
+
+<div class="group">
   <button
     class="btn btn-icon"
     type="button"

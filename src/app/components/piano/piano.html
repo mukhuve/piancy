@@ -1,4 +1,8 @@
-<app-keymap [first]="first()" [size]="size()" (moved)="move($event)"></app-keymap>
+<app-keymap
+  [first]="keyboard.first()"
+  [size]="keyboard.size()"
+  (moved)="keyboard.move($event)"
+></app-keymap>
 
 @if (settings.hints()) {
   <app-legend></app-legend>
@@ -8,7 +12,7 @@
   <i class="corner tl"></i><i class="corner tr"></i>
   <i class="corner bl"></i><i class="corner br"></i>
 
-  @for (key of keys(); track key.pitch.midi) {
+  @for (key of keyboard.keys(); track key.pitch.midi) {
     <app-tile
       [key]="key"
       [tabbable]="key.pitch.midi === tabStop()"

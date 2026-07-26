@@ -30,6 +30,19 @@
   }
 
   .stage {
-    @apply flex-1 m-4 mb-0 min-w-0;
+    @apply flex flex-col flex-1 gap-4 m-4 mb-0 min-w-0;
+
+    app-visualizer {
+      @apply flex-1 min-h-0;
+
+      /* con cancion cargada el visualizador se aparta y el carril manda */
+      &.compact {
+        @apply flex-none h-24;
+      }
+    }
+
+    app-lane {
+      @apply flex-1 min-h-0;
+    }
   }
 }

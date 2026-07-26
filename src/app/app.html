@@ -71,7 +71,13 @@
 </header>
 
 <div class="body">
-  <app-visualizer class="blueprint stage"></app-visualizer>
+  <div class="stage">
+    <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
+
+    @if (hasTrack()) {
+      <app-lane class="blueprint"></app-lane>
+    }
+  </div>
 
   @if (panel()) {
     <app-synth-panel></app-synth-panel>

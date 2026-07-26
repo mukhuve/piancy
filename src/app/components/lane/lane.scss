@@ -1,0 +1,13 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply relative block bg-neutral-100 overflow-hidden;
+
+  canvas {
+    @apply absolute inset-0 block w-full h-full;
+  }
+
+  .reading {
+    @apply absolute top-2 left-3 z-10 pointer-events-none;
+  }
+}

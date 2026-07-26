@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { PianoKey } from '../../keyboard/keyboard';
 import { layout } from '../../music/keyboard';
 import { FakeAudioContext } from '../../synth/audio-context.fake';
 import { Synth } from '../../synth/synth';
-import { PianoKey } from '../piano/piano';
 import { Tile } from './tile';
 
 const [C4] = layout([60, 62]);
