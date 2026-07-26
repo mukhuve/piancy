@@ -58,8 +58,13 @@
     @apply flex flex-1 min-h-0;
   }
 
+  /* columna de trabajo: escenario, teclado y barra del pie, siempre del mismo ancho */
+  .main {
+    @apply flex flex-col flex-1 min-w-0 min-h-0;
+  }
+
   .stage {
-    @apply flex flex-col flex-1 gap-4 m-4 mb-0 min-w-0;
+    @apply flex flex-col flex-1 gap-4 m-4 mb-0 min-w-0 min-h-0;
 
     app-visualizer {
       @apply flex-1 min-h-0;

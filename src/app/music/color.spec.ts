@@ -1,4 +1,4 @@
-import { chordColor, colorOf } from './color';
+import { chordColor, colorOf, toCss } from './color';
 
 /** Angulo del color en el circulo cromatico, para comparar tonos sin mirar canales. */
 function hueOf({ r, g, b }: { r: number; g: number; b: number }) {
@@ -42,19 +42,31 @@ describe('color', () => {
     expect(chordColor([60])).toBe('rgb(0, 255, 184)');
   });
 
-  it('el color de un acorde siempre cabe en el canal, o CSS no lo pinta', () => {
-    const canales = (color: string) => color.match(/\d+/g)!.map(Number);
+  it('un acorde se pinta del color de su fundamental, no de la mezcla', () => {
+    expect(chordColor([60, 64, 67])).toBe(toCss(colorOf(60))); // do mayor
+    expect(chordColor([62, 65, 69])).toBe(toCss(colorOf(62))); // re menor
+    expect(chordColor([60, 63, 67])).toBe(toCss(colorOf(60))); // do menor: la misma raiz
 
-    [
-      [60, 64, 67],
-      [48, 52, 55, 60, 64, 67, 72],
+    // invertido, la fundamental esta una octava mas arriba: mismo tono, mas brillo
+    const invertido = chordColor([64, 67, 72]);
+
+    expect(invertido).toBe(toCss(colorOf(72)));
+    expect(hueOf(colorOf(72))).toBeCloseTo(hueOf(colorOf(60)), 0);
+  });
+
+  it('lo que no es un acorde se mezcla, y la mezcla cabe siempre en el canal', () => {
+    const canales = (color: string) => color.match(/\d+/g)!.map(Number);
+    const racimos = [
+      [60, 61, 62],
+      [60, 61, 62, 63, 64, 65],
       Array.from({ length: 12 }, (_, i) => 60 + i),
-    ].forEach((acorde) => {
-      expect(canales(chordColor(acorde)).every((canal) => canal >= 0 && canal <= 255)).toBe(true);
+    ];
+
+    racimos.forEach((racimo) => {
+      expect(canales(chordColor(racimo)).every((canal) => canal >= 0 && canal <= 255)).toBe(true);
     });
 
-    // y un acorde sigue siendo mas luminoso que cualquiera de sus notas
-    const suma = (color: string) => canales(color).reduce((a, b) => a + b, 0);
-    expect(suma(chordColor([60, 64, 67]))).toBeGreaterThan(suma(chordColor([60])));
+    // la mezcla aprovecha todo el rango: su canal mas alto llega al tope
+    expect(Math.max(...canales(chordColor(racimos[1])))).toBe(255);
   });
 });

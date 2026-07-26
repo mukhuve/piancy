@@ -1,6 +1,11 @@
-@for (note of notes(); track note.name) {
-  <div class="note" [class.outside]="!note.degree">
-    <span class="swatch" [style.background]="note.color"></span>
-    <span class="label">{{ note.degree || note.name }}</span>
-  </div>
-}
+<span class="label title">Note colours · {{ key() }}</span>
+
+<div class="scale">
+  @for (note of notes(); track note.name) {
+    <div class="note" [class.outside]="!note.degree" [title]="note.name">
+      <span class="swatch" [style.background]="note.color"></span>
+      <span class="name">{{ note.name }}</span>
+      <span class="degree">{{ note.degree || "·" }}</span>
+    </div>
+  }
+</div>

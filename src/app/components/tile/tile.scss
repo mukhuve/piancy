@@ -2,7 +2,7 @@
 
 :host {
   @apply absolute top-0 bottom-0 z-10 flex flex-col items-center justify-end gap-1 pb-2;
-  @apply bg-key text-key-ink border border-divider cursor-pointer overflow-hidden;
+  @apply bg-key text-key-ink border border-key-edge cursor-pointer overflow-hidden;
   @apply transition-colors duration-75 ease-out;
 
   border-radius: 0;

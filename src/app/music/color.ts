@@ -1,3 +1,4 @@
+import { chordOf } from './chords';
 import { frequencyOf, octaveOf } from './pitch';
 
 export interface Rgb {
@@ -62,14 +63,22 @@ export function toCss({ r, g, b }: Rgb) {
 }
 
 /**
- * Color de lo que suena ahora: los canales se suman, de modo que un acorde ilumina
- * mas que una nota suelta, y la mezcla se reescala entera para que quepa en el
- * canal. Escalar en vez de recortar conserva el tono —un acorde queda claro, no
- * blanco— y sobre todo devuelve siempre un color valido: sumar sin mas se sale de
- * 255 en cuanto hay dos notas, y CSS descarta ese color y no pinta nada.
+ * Color de lo que suena ahora. Un acorde toma el color de su fundamental, que es
+ * la nota que le da nombre: mezclar los colores de sus notas daba un tono que no
+ * era el de ninguna y que ademas se iba aclarando conforme se añadian.
+ *
+ * Cuando lo que suena no encaja en ningun acorde no hay fundamental que valga, asi
+ * que se recurre a la mezcla: los canales se suman —un racimo de notas ilumina mas
+ * que una sola— y se reescala entera para que quepa en el canal. Escalar en vez de
+ * recortar conserva el tono y, sobre todo, devuelve siempre un color valido: sumar
+ * sin mas se sale de 255 en cuanto hay dos notas, y CSS descarta ese color.
  */
-export function chordColor(midis: number[]) {
+export function chordColor(midis: readonly number[]) {
   if (!midis.length) return '';
+
+  const { root } = chordOf(midis);
+
+  if (root !== undefined) return toCss(colorOf(root));
 
   const sum = midis
     .map(colorOf)

@@ -1,17 +1,40 @@
 @reference "../../../styles.css";
 
 :host {
-  @apply flex items-center gap-4 flex-wrap;
+  @apply flex items-center gap-4 min-w-0;
+
+  .title {
+    @apply shrink-0;
+  }
+
+  .scale {
+    @apply flex items-stretch gap-px min-w-0 overflow-hidden;
+  }
 
   .note {
-    @apply flex items-center gap-1.5;
+    @apply flex flex-col items-center gap-0.5 px-1.5 py-0.5 min-w-0;
 
+    /* las notas de fuera de la tonalidad pesan menos, pero se siguen leyendo */
     &.outside {
       @apply opacity-55;
     }
   }
 
   .swatch {
-    @apply block w-3 h-2;
+    @apply block w-full h-1.5;
+
+    min-width: 1.4rem;
+  }
+
+  .name {
+    @apply font-heading text-[11px] leading-none text-ink;
+
+    letter-spacing: 0.04em;
+  }
+
+  .degree {
+    @apply text-[9px] leading-none text-neutral-600;
+
+    letter-spacing: 0.1em;
   }
 }

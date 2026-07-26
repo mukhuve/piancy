@@ -1,4 +1,4 @@
-import { pitchOf } from './pitch';
+import { pitchClassOf, pitchOf } from './pitch';
 
 /**
  * Acordes por sus intervalos en semitonos desde la fundamental. La cadena vacia es
@@ -22,16 +22,27 @@ const CHORDS: Readonly<Record<string, string>> = {
   '0,3': 'm3',
 };
 
-/**
- * Nombre de lo que suena: la nota suelta si es una, el acorde si las notas encajan
- * en alguno probando cada una como fundamental, y si no la lista de notas. Las
- * octavas no cuentan, asi que las inversiones se reconocen igual.
- */
-export function chordName(midis: number[]): string {
-  if (!midis.length) return '';
-  if (midis.length === 1) return pitchOf(midis[0]).name;
+/** Lo que suena: como se llama y cual es su nota fundamental. */
+export interface Chord {
+  readonly name: string;
+  /** La nota que da nombre a lo que suena, la mas grave de su clase. */
+  readonly root?: number;
+}
 
-  const classes = [...new Set(midis.map((midi) => pitchOf(midi).pitchClass))];
+/**
+ * Reconoce lo que suena probando cada nota como fundamental. Las octavas no
+ * cuentan, asi que las inversiones se reconocen igual; la fundamental que se
+ * devuelve es la nota real mas grave de esa clase, para poder darle su color.
+ */
+export function chordOf(midis: readonly number[]): Chord {
+  if (!midis.length) return { name: '' };
+
+  const lowest = (pitchClass: number) =>
+    Math.min(...midis.filter((midi) => pitchClassOf(midi) === pitchClass));
+
+  if (midis.length === 1) return { name: pitchOf(midis[0]).name, root: midis[0] };
+
+  const classes = [...new Set(midis.map(pitchClassOf))];
 
   for (const root of classes) {
     const intervals = classes
@@ -39,8 +50,14 @@ export function chordName(midis: number[]): string {
       .sort((a, b) => a - b)
       .join(',');
 
-    if (intervals in CHORDS) return pitchOf(root).step + CHORDS[intervals];
+    if (intervals in CHORDS) {
+      return { name: pitchOf(root).step + CHORDS[intervals], root: lowest(root) };
+    }
   }
 
-  return classes.map((pitchClass) => pitchOf(pitchClass).step).join(' ');
+  return { name: classes.map((pitchClass) => pitchOf(pitchClass).step).join(' ') };
+}
+
+export function chordName(midis: readonly number[]) {
+  return chordOf(midis).name;
 }

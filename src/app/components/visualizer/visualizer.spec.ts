@@ -20,15 +20,19 @@ describe('Visualizer', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('anuncia la tonalidad y las voces que suenan', () => {
+  it('anuncia lo que suena: la nota, su afinacion y cuantas voces', () => {
     const reading = () => fixture.nativeElement.querySelector('.reading').textContent.trim();
 
-    expect(reading()).toBe('C major');
+    expect(reading()).toBe('');
 
     synth.noteOn(60);
-    synth.noteOn(64);
     fixture.detectChanges();
-    expect(reading()).toBe('2 voices · C major');
+    expect(reading()).toBe('C4 · 261.6 Hz');
+
+    synth.noteOn(64);
+    synth.noteOn(67);
+    fixture.detectChanges();
+    expect(reading()).toBe('C · 261.6 Hz · 3 voices');
   });
 
   it('retira la ayuda de arranque en cuanto se toca algo, y no vuelve', () => {

@@ -1,6 +1,7 @@
 import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { animate, fit, themeReader } from '../../canvas/paint';
-import { Tonality } from '../../music/scales';
+import { chordOf } from '../../music/chords';
+import { pitchOf } from '../../music/pitch';
 import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
 import { drawGrid, drawSpectrum, drawVoices, drawWave } from './visualizer.paint';
@@ -18,18 +19,23 @@ export class Visualizer {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly palette = themeReader(this.host.nativeElement, COLORS);
 
-  protected readonly tonality = inject(Tonality);
-
   private readonly settings = inject(Settings);
   protected readonly playing = computed(() => this.synth.playing().length > 0);
 
   /** La ayuda de arranque se retira en cuanto se toca algo, y no vuelve. */
   protected readonly touched = signal(false);
 
+  /** Lo que se lee sobre el grafico es lo que suena: la nota, su afinacion y cuantas. */
   protected readonly reading = computed(() => {
-    const voices = this.synth.playing().length;
+    const playing = this.synth.playing();
 
-    return voices ? `${voices} voices · ${this.tonality.name()}` : this.tonality.name();
+    if (!playing.length) return '';
+
+    const { name, root } = chordOf(playing);
+    const tuning = root === undefined ? '' : `${pitchOf(root).frequency.toFixed(1)} Hz`;
+    const voices = playing.length > 1 ? `${playing.length} voices` : '';
+
+    return [name, tuning, voices].filter(Boolean).join(' · ');
   });
 
   constructor() {

@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { WHITE_KEYS } from '../../music/keyboard';
+import { pitchOf } from '../../music/pitch';
 import { Synth } from '../../synth/synth';
 
 /**
@@ -30,11 +31,18 @@ export class Keymap {
 
   private readonly synth = inject(Synth);
 
-  /** Una blanca esta encendida si suena ella o la negra que lleva al lado. */
+  /**
+   * Una blanca se enciende si suena ella o la negra que cuelga a su derecha. Hay que
+   * mirar que la siguiente nota sea negra: entre mi y fa, y entre si y do, la de al
+   * lado es otra blanca y encenderia las dos.
+   */
   readonly lit = computed(() => {
     const playing = this.synth.playing();
 
-    return WHITE_KEYS.map((midi) => playing.includes(midi) || playing.includes(midi + 1));
+    return WHITE_KEYS.map(
+      (midi) =>
+        playing.includes(midi) || (pitchOf(midi + 1).sharp && playing.includes(midi + 1))
+    );
   });
 
   jump(event: PointerEvent) {

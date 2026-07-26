@@ -5,8 +5,8 @@
     <button
       class="mode"
       type="button"
-      [class.on]="settings.mode() === 'play'"
-      [attr.aria-pressed]="settings.mode() === 'play'"
+      [class.on]="isPlay()"
+      [attr.aria-pressed]="isPlay()"
       (click)="settings.mode.set('play')"
     >
       Play
@@ -14,8 +14,8 @@
     <button
       class="mode"
       type="button"
-      [class.on]="settings.mode() === 'learn'"
-      [attr.aria-pressed]="settings.mode() === 'learn'"
+      [class.on]="!isPlay()"
+      [attr.aria-pressed]="!isPlay()"
       (click)="settings.mode.set('learn')"
     >
       Learn
@@ -29,9 +29,9 @@
     type="button"
     title="Sound and synthesis"
     aria-label="Sound and synthesis"
-    [class.on]="panel()"
-    [attr.aria-pressed]="panel()"
-    (click)="panel.set(!panel())"
+    [class.on]="aside() === 'synth'"
+    [attr.aria-pressed]="aside() === 'synth'"
+    (click)="toggleAside('synth')"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
       <path d="M6 4v6M6 14v6M12 4v3M12 11v9M18 4v10M18 18v2"></path>
@@ -42,42 +42,11 @@
   <button
     class="btn btn-icon"
     type="button"
-    title="Practice bar — tempo and click"
-    aria-label="Practice bar"
-    [class.on]="settings.transport()"
-    [attr.aria-pressed]="settings.transport()"
-    (click)="settings.transport.set(!settings.transport())"
-  >
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <circle cx="12" cy="12" r="8"></circle>
-      <circle cx="12" cy="12" r="3"></circle>
-    </svg>
-  </button>
-
-  <button
-    class="btn btn-icon"
-    type="button"
-    title="Note names and degrees on the keys"
-    aria-label="Note names and degrees on the keys"
-    [class.on]="settings.hints()"
-    [attr.aria-pressed]="settings.hints()"
-    (click)="settings.hints.set(!settings.hints())"
-  >
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-      <path d="M6 5v10.5"></path><circle cx="4" cy="17" r="2"></circle>
-      <path d="M6 5l7-1.5v10.5"></path><circle cx="11" cy="15.5" r="2"></circle>
-      <path d="M17 8h4M17 12h4M17 16h4"></path>
-    </svg>
-  </button>
-
-  <button
-    class="btn btn-icon"
-    type="button"
     title="App settings"
     aria-label="App settings"
-    [class.on]="menu()"
-    [attr.aria-expanded]="menu()"
-    (click)="menu.set(!menu())"
+    [class.on]="aside() === 'settings'"
+    [attr.aria-pressed]="aside() === 'settings'"
+    (click)="toggleAside('settings')"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
       <circle cx="12" cy="12" r="3"></circle>
@@ -106,32 +75,37 @@
       </svg>
     }
   </button>
-
-  @if (menu()) {
-    <app-settings-menu (closed)="menu.set(false)"></app-settings-menu>
-  }
 </header>
 
 <div class="body">
-  <div class="stage">
-    <app-visualizer class="blueprint" [class.compact]="compact()"></app-visualizer>
+  <!-- teclado y carril comparten columna: cualquier panel lateral los estrecha a
+       la vez y las notas siguen cayendo justo sobre sus teclas -->
+  <div class="main">
+    <div class="stage">
+      @if (isPlay()) {
+        <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
 
-    @if (isPlay() && hasTrack()) {
-      <app-lane class="blueprint"></app-lane>
-    }
+        @if (hasTrack()) {
+          <app-lane class="blueprint"></app-lane>
+        }
+      } @else {
+        <app-lesson class="blueprint"></app-lesson>
+      }
+    </div>
 
-    @if (!isPlay()) {
-      <app-lesson class="blueprint"></app-lesson>
+    <app-piano></app-piano>
+
+    @if (settings.transport()) {
+      <app-transport></app-transport>
     }
   </div>
 
-  @if (panel()) {
-    <app-synth-panel></app-synth-panel>
+  @switch (aside()) {
+    @case ('synth') {
+      <app-synth-panel></app-synth-panel>
+    }
+    @case ('settings') {
+      <app-settings-panel></app-settings-panel>
+    }
   }
 </div>
-
-<app-piano></app-piano>
-
-@if (settings.transport()) {
-  <app-transport></app-transport>
-}
