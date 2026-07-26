@@ -1,6 +1,27 @@
 <header>
   <h1>Piancy</h1>
 
+  <div class="modes">
+    <button
+      class="mode"
+      type="button"
+      [class.on]="settings.mode() === 'play'"
+      [attr.aria-pressed]="settings.mode() === 'play'"
+      (click)="settings.mode.set('play')"
+    >
+      Play
+    </button>
+    <button
+      class="mode"
+      type="button"
+      [class.on]="settings.mode() === 'learn'"
+      [attr.aria-pressed]="settings.mode() === 'learn'"
+      (click)="settings.mode.set('learn')"
+    >
+      Learn
+    </button>
+  </div>
+
   <span class="chord">{{ chord() }}</span>
 
   <button
@@ -72,10 +93,14 @@
 
 <div class="body">
   <div class="stage">
-    <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
+    <app-visualizer class="blueprint" [class.compact]="compact()"></app-visualizer>
 
-    @if (hasTrack()) {
+    @if (isPlay() && hasTrack()) {
       <app-lane class="blueprint"></app-lane>
+    }
+
+    @if (!isPlay()) {
+      <app-lesson class="blueprint"></app-lesson>
     }
   </div>
 

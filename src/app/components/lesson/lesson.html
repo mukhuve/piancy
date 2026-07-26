@@ -1,0 +1,52 @@
+<i class="corner tl"></i><i class="corner tr"></i>
+<i class="corner bl"></i><i class="corner br"></i>
+
+<div class="head">
+  <span class="label">Lesson {{ number() }}</span>
+  <span class="label">{{ progress() }}</span>
+  @if (lessons.done().has(lessons.lesson().id)) {
+    <span class="label done">Completed</span>
+  }
+
+  <select id="lesson" (change)="lessons.choose(+$any($event.target).value)">
+    @for (lesson of lessons.lessons; track lesson.id; let i = $index) {
+      <option [value]="i" [selected]="i === lessons.index()">
+        {{ lessons.done().has(lesson.id) ? "✓ " : "" }}{{ lesson.title }}
+      </option>
+    }
+  </select>
+</div>
+
+<h2>{{ lessons.lesson().title }}</h2>
+<p>{{ lessons.lesson().hint }}</p>
+
+<div class="marks">
+  <div class="dots">
+    @for (step of lessons.lesson().steps; track $index) {
+      <span
+        class="dot"
+        [class.past]="$index < lessons.step()"
+        [class.now]="$index === lessons.step()"
+      ></span>
+    }
+  </div>
+
+  <div class="targets">
+    @for (target of targets(); track target.label) {
+      <span class="target" [style.background]="target.color">{{ target.label }}</span>
+    }
+  </div>
+</div>
+
+<div class="actions">
+  <button class="btn btn-primary" type="button" (click)="lessons.demo()">
+    {{ lessons.lesson().kind === "ear" ? "Listen" : "Play demo" }}
+  </button>
+  <button class="btn" type="button" (click)="lessons.restart()">Restart</button>
+
+  @if (lessons.cleared() && lessons.index() < lessons.lessons.length - 1) {
+    <button class="btn" type="button" (click)="lessons.next()">Next lesson →</button>
+  }
+
+  <span class="status" [class.ok]="lessons.ok()">{{ lessons.status() }}</span>
+</div>

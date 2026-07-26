@@ -1,3 +1,4 @@
+@if (isPlay()) {
 <div class="group">
   <label class="label" for="track">Track</label>
   <select id="track" (change)="choose($any($event.target).value)">
@@ -30,6 +31,7 @@
     />
     <span class="figure">{{ (player.speed() * 100).toFixed(0) }}%</span>
   </div>
+}
 }
 
 <div class="group">

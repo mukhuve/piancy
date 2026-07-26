@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Piano } from './components/piano/piano';
 import { SynthPanel } from './components/synth-panel/synth-panel';
 import { Lane } from './components/lane/lane';
+import { Lesson } from './components/lesson/lesson';
 import { Transport } from './components/transport/transport';
 import { Visualizer } from './components/visualizer/visualizer';
 import { chordName } from './music/chords';
@@ -14,7 +15,7 @@ import { Synth } from './synth/synth';
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
-  imports: [Lane, Piano, SynthPanel, Transport, Visualizer],
+  imports: [Lane, Lesson, Piano, SynthPanel, Transport, Visualizer],
   host: {
     '[style.--tone-color]': 'color()',
   },
@@ -25,7 +26,10 @@ export class App {
   protected readonly settings = inject(Settings);
   private readonly player = inject(Player);
 
+  readonly isPlay = computed(() => this.settings.mode() === 'play');
   readonly hasTrack = computed(() => !!this.player.song());
+  /** El visualizador se aparta cuando hay carril o leccion que enseñar. */
+  readonly compact = computed(() => !this.isPlay() || this.hasTrack());
 
   readonly color = computed(() => chordColor(this.synth.playing()));
   readonly chord = computed(() => chordName(this.synth.playing()));

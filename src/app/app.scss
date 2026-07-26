@@ -10,11 +10,29 @@
     @apply flex items-center gap-2 px-6 py-2 border-b border-divider shrink-0;
 
     h1 {
-      @apply text-xl mr-auto;
+      @apply text-xl;
+    }
+
+    .modes {
+      @apply flex gap-4;
+
+      .mode {
+        @apply font-heading text-sm uppercase cursor-pointer bg-transparent border-none;
+        @apply py-1 text-neutral-500;
+
+        border-bottom: 2px solid transparent;
+        letter-spacing: 0.16em;
+
+        &.on {
+          @apply text-ink;
+
+          border-bottom-color: var(--color-accent-600);
+        }
+      }
     }
 
     .chord {
-      @apply font-heading text-sm uppercase text-accent-800 text-right mr-2;
+      @apply font-heading text-sm uppercase text-accent-800 text-right mr-2 ml-auto;
 
       letter-spacing: 0.12em;
       min-width: 5rem;
@@ -41,7 +59,8 @@
       }
     }
 
-    app-lane {
+    app-lane,
+    app-lesson {
       @apply flex-1 min-h-0;
     }
   }
