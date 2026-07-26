@@ -1,6 +1,7 @@
 import { Component, ElementRef, computed, inject, input, output } from '@angular/core';
 import { colorOf, toCss } from '../../music/color';
 import { Tonality } from '../../music/scales';
+import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
 import { PianoKey } from '../piano/piano';
 
@@ -41,6 +42,8 @@ export class Tile {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly synth = inject(Synth);
   private readonly tonality = inject(Tonality);
+
+  protected readonly settings = inject(Settings);
 
   readonly active = computed(() => this.synth.playing().includes(this.key().pitch.midi));
   readonly color = computed(() => toCss(colorOf(this.key().pitch.midi)));

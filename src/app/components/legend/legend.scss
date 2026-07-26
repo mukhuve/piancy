@@ -1,0 +1,17 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply flex items-center gap-4 flex-wrap;
+
+  .note {
+    @apply flex items-center gap-1.5;
+
+    &.outside {
+      @apply opacity-55;
+    }
+  }
+
+  .swatch {
+    @apply block w-3 h-2;
+  }
+}

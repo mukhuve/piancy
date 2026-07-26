@@ -97,6 +97,28 @@ export class Synth {
     this.sync();
   }
 
+  /**
+   * Un pitido corto y seco, para el metronomo y las cuentas atras. Va directo al
+   * volumen general: no es una nota y no debe arrastrar eco ni reverb.
+   */
+  blip(frequency: number, seconds: number, gain: number) {
+    const context = this.open();
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const amp = context.createGain();
+
+    oscillator.type = 'square';
+    oscillator.frequency.value = frequency;
+    amp.gain.setValueAtTime(0, now);
+    amp.gain.linearRampToValueAtTime(gain, now + 0.004);
+    amp.gain.exponentialRampToValueAtTime(0.0005, now + seconds);
+
+    oscillator.connect(amp);
+    amp.connect(this.bus!.master);
+    oscillator.start(now);
+    oscillator.stop(now + seconds + 0.05);
+  }
+
   /** Suelta todo lo que suene: al cambiar de rango quedarian notas colgadas. */
   panic() {
     [...this.voices.keys()].forEach((midi) => this.release(midi));

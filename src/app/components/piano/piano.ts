@@ -1,7 +1,9 @@
 import { Component, computed, inject, input, signal, viewChildren } from '@angular/core';
 import { KEY_MAP, KEY_MAP_RANGE, SHIFT_KEYS } from '../../input/computer-keys';
 import { Key, WHITE_KEYS, layout } from '../../music/keyboard';
+import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
+import { Legend } from '../legend/legend';
 import { Keymap } from '../keymap/keymap';
 import { Tile } from '../tile/tile';
 
@@ -17,7 +19,7 @@ export interface PianoKey extends Key {
 
 @Component({
   selector: 'app-piano',
-  imports: [Tile, Keymap],
+  imports: [Tile, Keymap, Legend],
   templateUrl: './piano.html',
   styleUrls: ['./piano.scss'],
   host: {
@@ -30,6 +32,8 @@ export class Piano {
   readonly octaves = input(3);
 
   private readonly synth = inject(Synth);
+
+  protected readonly settings = inject(Settings);
   private readonly tiles = viewChildren(Tile);
 
   /** Primera blanca visible, como indice sobre las 52 del piano. */

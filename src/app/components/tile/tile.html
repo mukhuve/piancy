@@ -1,9 +1,9 @@
 @if (key().shortcut) {
   <small class="shortcut">{{ key().shortcut }}</small>
 }
-@if (degree()) {
+@if (settings.hints() && degree()) {
   <strong class="degree">{{ degree() }}</strong>
 }
-@if (!key().black) {
+@if (settings.hints() && !key().black) {
   <small class="name">{{ key().pitch.name }}</small>
 }

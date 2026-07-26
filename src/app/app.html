@@ -21,6 +21,37 @@
   <button
     class="btn btn-icon"
     type="button"
+    title="Practice bar — tempo and click"
+    aria-label="Practice bar"
+    [class.on]="settings.transport()"
+    [attr.aria-pressed]="settings.transport()"
+    (click)="settings.transport.set(!settings.transport())"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="12" r="8"></circle>
+      <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+  </button>
+
+  <button
+    class="btn btn-icon"
+    type="button"
+    title="Note names and degrees on the keys"
+    aria-label="Note names and degrees on the keys"
+    [class.on]="settings.hints()"
+    [attr.aria-pressed]="settings.hints()"
+    (click)="settings.hints.set(!settings.hints())"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path d="M6 5v10.5"></path><circle cx="4" cy="17" r="2"></circle>
+      <path d="M6 5l7-1.5v10.5"></path><circle cx="11" cy="15.5" r="2"></circle>
+      <path d="M17 8h4M17 12h4M17 16h4"></path>
+    </svg>
+  </button>
+
+  <button
+    class="btn btn-icon"
+    type="button"
     [attr.aria-label]="darkmode() ? 'Switch to light theme' : 'Switch to dark theme'"
     (click)="toggleDarkMode()"
   >
@@ -48,3 +79,7 @@
 </div>
 
 <app-piano></app-piano>
+
+@if (settings.transport()) {
+  <app-transport></app-transport>
+}
