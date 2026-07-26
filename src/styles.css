@@ -1,35 +1,196 @@
-@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* el modo oscuro se activa con la clase .dark en <html> */
 @custom-variant dark (.dark &);
 
+/* Tokens del sistema Industry: rampas generadas en OKLCH sobre una misma escala
+   de luminosidad, de modo que el mismo paso de cualquier rampa pesa igual. */
 @theme {
-  --color-white: #fffbeb;
-  --color-black: #393e41;
-  --color-gold-regular: #ffd52e;
-  --color-gold-light: #efe0a4;
-  --color-gold-dark: #d1a700;
-  --color-green: #4caf50;
-  --color-red: #f44336;
+  --color-bg: #f2f2f3;
+  --color-surface: #e9e9ea;
+  --color-ink: #1d1f20;
+  --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+  --color-neutral-100: #f5f5f8;
+  --color-neutral-200: #e7e7ea;
+  --color-neutral-300: #d4d4d7;
+  --color-neutral-400: #b7b7ba;
+  --color-neutral-500: #98989b;
+  --color-neutral-600: #7a7a7d;
+  --color-neutral-700: #5d5d60;
+  --color-neutral-800: #424244;
+  --color-neutral-900: #2b2b2d;
+
+  --color-accent-100: #eef6ff;
+  --color-accent-200: #d6ebff;
+  --color-accent-300: #b5d9fd;
+  --color-accent-400: #94bce3;
+  --color-accent-500: #749dc4;
+  --color-accent-600: #597ea3;
+  --color-accent-700: #416180;
+  --color-accent-800: #2c455d;
+  --color-accent-900: #1d2d3d;
+
+  /* El teclado es un objeto fisico: ni sus teclas ni lo escrito en ellas se
+     invierten con el tema, o el texto acabaria del color de su propia tecla. */
+  --color-key: #f5f5f8;
+  --color-key-ink: #5d5d60;
+  --color-key-sharp: #2b2b2d;
+  --color-key-sharp-ink: #b7b7ba;
+
+  --font-heading: "Barlow Condensed", system-ui, sans-serif;
+  --font-body: "Barlow", system-ui, sans-serif;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #2b2b2d 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #2b2b2d 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #2b2b2d 22%, transparent);
+}
+
+/* En oscuro se invierte el suelo y la rampa neutra; el acento ya funciona en
+   ambos, solo cambia el paso que se usa. */
+.dark {
+  --color-bg: #1d1f20;
+  --color-surface: #2b2b2d;
+  --color-ink: #f5f5f8;
+  --color-divider: color-mix(in srgb, #f5f5f8 18%, transparent);
+
+  --color-neutral-100: #2b2b2d;
+  --color-neutral-200: #424244;
+  --color-neutral-300: #5d5d60;
+  --color-neutral-400: #7a7a7d;
+  --color-neutral-500: #98989b;
+  --color-neutral-600: #b7b7ba;
+  --color-neutral-700: #d4d4d7;
+  --color-neutral-800: #e7e7ea;
+  --color-neutral-900: #f5f5f8;
+
+  --color-accent-100: #1d2d3d;
+  --color-accent-200: #2c455d;
+  --color-accent-300: #416180;
+  --color-accent-400: #597ea3;
+  --color-accent-500: #749dc4;
+  --color-accent-600: #94bce3;
+  --color-accent-700: #b5d9fd;
+  --color-accent-800: #d6ebff;
+  --color-accent-900: #eef6ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  @apply bg-gray-100 flex flex-row items-center justify-center dark:bg-black dark:text-white;
-  font-size: 16px;
+  @apply bg-bg text-ink font-body;
+
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
   width: 100svw;
   height: 100svh;
-
-  * {
-    box-sizing: border-box;
-  }
+  overflow: hidden;
 }
 
 h1,
-h2 {
-  font-family: "Dancing Script", cursive;
+h2,
+h3 {
+  @apply font-heading font-semibold uppercase;
+
+  letter-spacing: 0.08em;
+  line-height: 1.12;
+  margin: 0;
 }
 
-button.btn {
-  @apply rounded-lg shadow-md flex flex-row items-center justify-center;
+/* Marco de plano: caja de esquinas rectas con marcas de registro en las cuatro
+   esquinas. Es el objeto basico del sistema; lleva cuatro <i class="corner">. */
+.blueprint {
+  @apply relative border border-divider;
+
+  border-radius: 0;
+
+  > .corner {
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      background: currentColor;
+    }
+
+    &::before {
+      left: 5px;
+      top: 0;
+      width: 1px;
+      height: 100%;
+    }
+
+    &::after {
+      top: 5px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+    }
+
+    &.tl { top: -6px; left: -6px; }
+    &.tr { top: -6px; right: -6px; }
+    &.bl { bottom: -6px; left: -6px; }
+    &.br { bottom: -6px; right: -6px; }
+  }
+}
+
+/* Etiqueta de plano: el texto pequeño en versal y muy espaciado del sistema. El
+   sistema lo pinta en neutral-600, que a este tamaño se queda por debajo de AA. */
+.label {
+  @apply text-[10px] uppercase text-neutral-700;
+
+  letter-spacing: 0.18em;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-1.5 cursor-pointer;
+  @apply font-heading font-semibold text-sm text-ink;
+  @apply border border-divider bg-transparent px-3 py-1.5;
+
+  border-radius: 0;
+
+  &:hover {
+    @apply bg-accent-100;
+  }
+
+  &:active {
+    @apply bg-accent-200;
+  }
+}
+
+.btn-primary {
+  @apply bg-accent-600 text-bg border-accent-600;
+
+  &:hover {
+    @apply bg-accent-700 border-accent-700;
+  }
+}
+
+.btn-icon {
+  @apply w-8 h-8 p-0;
+
+  svg {
+    @apply w-[17px] h-[17px];
+
+    stroke-width: 1.5;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-600);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-accent-200);
+  color: var(--color-accent-900);
 }

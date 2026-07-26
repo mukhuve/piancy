@@ -1,16 +1,15 @@
 @reference "../../../styles.css";
 
 :host {
-  @apply flex flex-col gap-3 p-4 bg-black rounded-xl shadow-2xl w-full;
+  @apply flex flex-col gap-3 px-4 pt-2 pb-4 w-full shrink-0;
 
   user-select: none;
 
-  /** Marco de referencia de las teclas, que se colocan en absoluto. */
+  /* Marco de referencia de las teclas, que se colocan en absoluto. */
   .keys {
-    @apply relative w-full h-40 rounded-md overflow-hidden;
-  }
-}
+    @apply relative w-full bg-neutral-200 overflow-hidden;
 
-:host-context(.dark) {
-  @apply bg-stone-700;
+    height: min(200px, 26vh);
+    min-height: 88px;
+  }
 }

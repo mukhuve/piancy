@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Piano } from './components/piano/piano';
 import { chordColor } from './music/color';
+import { chordName } from './music/chords';
 import { Synth } from './synth/synth';
 
 @Component({
@@ -16,6 +17,7 @@ export class App {
   private readonly synth = inject(Synth);
 
   readonly color = computed(() => chordColor(this.synth.playing()));
+  readonly chord = computed(() => chordName(this.synth.playing()));
   readonly playing = computed(() => this.synth.playing().length > 0);
   readonly darkmode = signal(false);
 

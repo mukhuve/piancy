@@ -1,6 +1,9 @@
 <app-keymap [first]="first()" [size]="size()" (moved)="move($event)"></app-keymap>
 
-<div class="keys" role="group" aria-label="Teclado">
+<div class="keys blueprint" role="group" aria-label="Keyboard">
+  <i class="corner tl"></i><i class="corner tr"></i>
+  <i class="corner bl"></i><i class="corner br"></i>
+
   @for (key of keys(); track key.pitch.midi) {
     <app-tile
       [key]="key"

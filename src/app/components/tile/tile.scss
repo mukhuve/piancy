@@ -2,62 +2,58 @@
 
 :host {
   @apply absolute top-0 bottom-0 z-10 flex flex-col items-center justify-end gap-1 pb-2;
-  @apply bg-white text-black/70 border border-black/15 cursor-pointer overflow-hidden;
+  @apply bg-key text-key-ink border border-divider cursor-pointer overflow-hidden;
   @apply transition-colors duration-75 ease-out;
 
-  border-radius: 0 0 0.25rem 0.25rem;
+  border-radius: 0;
   user-select: none;
   touch-action: none;
 
   .shortcut {
-    @apply w-5 h-5 rounded-xs flex items-center justify-center text-[0.6rem];
-    @apply bg-black/20 text-inherit;
+    @apply flex items-center justify-center w-4 h-4 text-[9px] uppercase;
+
+    border: 1px solid currentColor;
+    opacity: 0.65;
+    letter-spacing: 0.08em;
   }
 
   .name {
-    @apply text-xs;
+    @apply font-heading text-sm;
+
+    letter-spacing: 0.04em;
   }
 
   &:hover {
-    @apply text-black;
+    background: color-mix(in srgb, var(--color-key) 88%, var(--color-accent-500));
   }
 
   &:focus-visible {
-    @apply outline-2 outline-offset-[-3px] outline-gold-dark;
+    outline-offset: -3px;
   }
 }
 
-/** Las negras cuelgan de arriba, mas estrechas y sin llegar al fondo. */
+/** Las negras cuelgan de arriba: mas estrechas, mas cortas y por encima. */
 :host(.black) {
-  @apply bottom-auto h-[62%] z-20 bg-black text-white/70 border-black;
+  @apply bottom-auto h-[62%] z-20 bg-key-sharp text-key-sharp-ink pb-1.5;
+
+  border-color: var(--color-key-sharp);
 
   .shortcut {
-    @apply w-4 h-4 text-[0.5rem] bg-white/20;
+    @apply w-3.5 h-3.5 text-[8px];
   }
 
   .name {
-    @apply text-[0.6rem];
+    @apply text-[11px];
   }
 
   &:hover {
-    @apply text-white;
+    background: color-mix(in srgb, var(--color-key-sharp) 82%, var(--color-accent-400));
   }
 }
 
 /** La tecla pulsada se pinta con el color de su nota. */
 :host(.active),
 :host(.black.active) {
-  @apply text-white;
-
+  color: #f5f5f8;
   background: var(--key-color);
-}
-
-:host-context(.dark) {
-  &:not(.active) {
-    @apply bg-gold-light text-black/60;
-  }
-
-  &.black:not(.active) {
-    @apply bg-stone-800 text-white/60;
-  }
 }

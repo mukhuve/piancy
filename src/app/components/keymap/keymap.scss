@@ -6,18 +6,16 @@
   touch-action: none;
 
   .tick {
-    @apply flex-1 self-center h-2 bg-white/25;
+    @apply flex-1 self-center h-2 bg-neutral-300;
 
     &.on {
-      @apply h-full bg-gold-regular;
+      @apply h-full bg-accent-600;
     }
   }
 
   .window {
-    @apply absolute inset-y-0 border-2 border-gold-regular bg-gold-regular/15 pointer-events-none;
-  }
+    @apply absolute inset-y-0 border border-accent-700 pointer-events-none;
 
-  &:focus-visible {
-    @apply outline-2 outline-offset-2 outline-gold-regular;
+    background: color-mix(in srgb, var(--color-accent-600) 14%, transparent);
   }
 }

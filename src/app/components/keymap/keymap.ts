@@ -12,7 +12,7 @@ import { Synth } from '../../synth/synth';
   styleUrls: ['./keymap.scss'],
   host: {
     role: 'slider',
-    'aria-label': 'Zona del teclado visible',
+    'aria-label': 'Visible range of the keyboard',
     '[attr.aria-valuemin]': '0',
     '[attr.aria-valuemax]': 'total - size()',
     '[attr.aria-valuenow]': 'first()',

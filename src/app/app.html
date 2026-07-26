@@ -1,19 +1,39 @@
-<header class="w-full absolute top-0 flex justify-end items-center p-3">
-  <a
-    class="mr-auto font-bold text-inherit hover:text-gold-dark dark:hover:text-gold-light"
-    href="https://github.com/mukhuve/piancy"
-    target="_blank"
-  >
-    <h2 class="text-4xl">&#64;mukhuve/piancy</h2>
-  </a>
+<header>
+  <h1>Piancy</h1>
+
+  <span class="chord">{{ chord() }}</span>
+
   <button
-    class="btn bg-black text-white p-4 dark:bg-white dark:text-black"
+    class="btn btn-icon"
+    type="button"
+    [attr.aria-label]="darkmode() ? 'Switch to light theme' : 'Switch to dark theme'"
     (click)="toggleDarkMode()"
   >
-    <i class="material-icons-round">
-      {{ darkmode() ? "wb_sunny" : "dark_mode" }}
-    </i>
+    @if (darkmode()) {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+        ></path>
+      </svg>
+    } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+      </svg>
+    }
   </button>
 </header>
+
+<main class="blueprint stage">
+  <i class="corner tl"></i><i class="corner tr"></i>
+  <i class="corner bl"></i><i class="corner br"></i>
+
+  @if (playing()) {
+    <span class="reading">{{ chord() }}</span>
+  } @else {
+    <h2>Press a key to start</h2>
+    <span class="label">Click the keyboard or type A W S E D F · space sustains</span>
+  }
+</main>
+
 <app-piano></app-piano>
-<div class="ind" [class.active]="playing()"></div>
