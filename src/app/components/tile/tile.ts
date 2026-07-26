@@ -1,63 +1,67 @@
-import { DecimalPipe } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
-import { Pitch } from '../../music/pitch';
+import { Component, ElementRef, computed, inject, input, output } from '@angular/core';
+import { colorOf, toCss } from '../../music/color';
 import { Synth } from '../../synth/synth';
+import { PianoKey } from '../piano/piano';
 
 @Component({
   selector: 'app-tile',
-  imports: [DecimalPipe],
   templateUrl: './tile.html',
   styleUrls: ['./tile.scss'],
   host: {
+    role: 'button',
+    '[class.black]': 'key().black',
     '[class.active]': 'active()',
-    '[attr.sharp]': 'pitch().sharp',
-    '(window:touchstart)': 'press($event)',
-    '(window:touchend)': 'press($event)',
-    '(window:mousedown)': 'press($event)',
-    '(window:mouseup)': 'press($event)',
-    '(mousedown)': 'touch($event)',
-    '(mouseup)': 'touch($event)',
-    '(mouseout)': 'touch($event)',
-    '(mouseenter)': 'touch($event)',
-    '(window:keydown)': 'touch($event)',
-    '(window:keyup)': 'touch($event)',
+    '[style.left.%]': 'key().x * 100',
+    '[style.width.%]': 'key().width * 100',
+    '[attr.aria-label]': 'key().pitch.name',
+    '[attr.aria-pressed]': 'active()',
+    '[attr.tabindex]': 'tabbable() ? 0 : -1',
+    '[style.--key-color]': 'color()',
+    '(pointerdown)': 'start()',
+    '(pointerenter)': 'drag($event)',
+    '(pointerup)': 'release()',
+    '(pointerleave)': 'release()',
+    '(keydown.enter)': 'start()',
+    '(keyup.enter)': 'release()',
+    '(keydown.arrowright)': 'moved.emit(1)',
+    '(keydown.arrowleft)': 'moved.emit(-1)',
+    '(blur)': 'release()',
   },
 })
 export class Tile {
-  readonly pitch = input.required<Pitch>();
-  readonly shortcut = input('');
+  readonly key = input.required<PianoKey>();
+  /** Solo una tecla esta en el orden de tabulacion: las flechas mueven el foco. */
+  readonly tabbable = input(false);
 
+  readonly focused = output<number>();
+  readonly moved = output<number>();
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly synth = inject(Synth);
 
-  readonly active = computed(() => this.synth.playing().includes(this.pitch().midi));
+  readonly active = computed(() => this.synth.playing().includes(this.key().pitch.midi));
+  readonly color = computed(() => toCss(colorOf(this.key().pitch.midi)));
 
-  private pressed = false;
-
-  /** El raton arrastrado sobre el teclado toca; hay que saber si el boton sigue abajo. */
-  press(event: Event) {
-    this.pressed = event.type === 'mousedown';
+  focus() {
+    this.host.nativeElement.focus();
   }
 
-  touch(event: KeyboardEvent | MouseEvent | TouchEvent) {
-    if (event instanceof KeyboardEvent && (event.key !== this.shortcut() || event.ctrlKey)) {
-      return;
-    }
-
-    const start = /start|down/.test(event.type);
-    const entering = /enter/.test(event.type) && this.pressed;
-
-    this.push(start || entering);
+  start() {
+    this.focus();
+    this.focused.emit(this.key().pitch.midi);
+    this.press();
   }
 
-  push(active = true) {
-    if (active === this.active()) return;
+  /** Arrastrar el puntero por el teclado toca, mientras siga pulsado. */
+  drag(event: PointerEvent) {
+    if (event.buttons > 0) this.press();
+  }
 
-    const { midi } = this.pitch();
+  press() {
+    this.synth.noteOn(this.key().pitch.midi);
+  }
 
-    if (active) {
-      this.synth.noteOn(midi);
-    } else {
-      this.synth.noteOff(midi);
-    }
+  release() {
+    this.synth.noteOff(this.key().pitch.midi);
   }
 }

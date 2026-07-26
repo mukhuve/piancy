@@ -1,47 +1,63 @@
 @reference "../../../styles.css";
 
 :host {
-  @apply relative flex flex-col items-center justify-end p-2 w-12 h-32 transition-all duration-75 ease-out;
-  @apply border-none bg-white shadow-lg font-bold cursor-pointer overflow-hidden;
-  @apply text-black/70 hover:text-black;
+  @apply absolute top-0 bottom-0 z-10 flex flex-col items-center justify-end gap-1 pb-2;
+  @apply bg-white text-black/70 border border-black/15 cursor-pointer overflow-hidden;
+  @apply transition-colors duration-75 ease-out;
 
   border-radius: 0 0 0.25rem 0.25rem;
   user-select: none;
+  touch-action: none;
 
-  strong, small {
-    user-select: none;
-    pointer-events: none;
+  .shortcut {
+    @apply w-5 h-5 rounded-xs flex items-center justify-center text-[0.6rem];
+    @apply bg-black/20 text-inherit;
   }
 
-  .key {
-    @apply w-6 h-6 rounded-xs flex items-center justify-center text-xs;
-    @apply pointer-events-none bg-stone-900/30 text-inherit;
+  .name {
+    @apply text-xs;
+  }
+
+  &:hover {
+    @apply text-black;
+  }
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-[-3px] outline-gold-dark;
   }
 }
 
-:host[sharp="true"] {
-  @apply w-6 h-[5rem] bg-stone-700 z-10 items-center p-0 shadow-xs pb-2;
-  @apply text-white/70 hover:text-white;
+/** Las negras cuelgan de arriba, mas estrechas y sin llegar al fondo. */
+:host(.black) {
+  @apply bottom-auto h-[62%] z-20 bg-black text-white/70 border-black;
 
-  margin-left: -0.9rem;
-  margin-right: -0.8rem;
-
-  .key {
-    @apply w-3 h-3;
-    font-size: 0.5rem;
+  .shortcut {
+    @apply w-4 h-4 text-[0.5rem] bg-white/20;
   }
+
+  .name {
+    @apply text-[0.6rem];
+  }
+
+  &:hover {
+    @apply text-white;
+  }
+}
+
+/** La tecla pulsada se pinta con el color de su nota. */
+:host(.active),
+:host(.black.active) {
+  @apply text-white;
+
+  background: var(--key-color);
 }
 
 :host-context(.dark) {
   &:not(.active) {
-    @apply bg-black/40 text-white/70 hover:text-white;
+    @apply bg-gold-light text-black/60;
   }
 
-  &[sharp="true"]:not(.active) {
-    @apply bg-gold-light text-stone-700/70 hover:text-stone-700;
+  &.black:not(.active) {
+    @apply bg-stone-800 text-white/60;
   }
-}
-
-:host.active {
-  @apply bg-green text-white shadow-xl;
 }

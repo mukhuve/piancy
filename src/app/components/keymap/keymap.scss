@@ -1,0 +1,23 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply relative flex items-stretch gap-px h-5 w-full cursor-pointer;
+
+  touch-action: none;
+
+  .tick {
+    @apply flex-1 self-center h-2 bg-white/25;
+
+    &.on {
+      @apply h-full bg-gold-regular;
+    }
+  }
+
+  .window {
+    @apply absolute inset-y-0 border-2 border-gold-regular bg-gold-regular/15 pointer-events-none;
+  }
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-gold-regular;
+  }
+}

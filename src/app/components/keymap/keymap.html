@@ -1,0 +1,8 @@
+@for (on of lit(); track $index) {
+  <span class="tick" [class.on]="on"></span>
+}
+<span
+  class="window"
+  [style.left.%]="(first() / total) * 100"
+  [style.width.%]="(size() / total) * 100"
+></span>

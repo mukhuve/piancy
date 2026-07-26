@@ -1,59 +1,173 @@
-import { Component, computed, inject, input } from '@angular/core';
-import { PIANO_KEYS } from '../../input/computer-keys';
-import { pitchesBetween } from '../../music/pitch';
+import { Component, computed, inject, input, signal, viewChildren } from '@angular/core';
+import { KEY_MAP, KEY_MAP_RANGE, SHIFT_KEYS } from '../../input/computer-keys';
+import { Key, WHITE_KEYS, layout } from '../../music/keyboard';
 import { Synth } from '../../synth/synth';
+import { Keymap } from '../keymap/keymap';
 import { Tile } from '../tile/tile';
 
-/** Intro de Crazy Train. Formato `NOTA:segundos`, acordes con `+`. */
-const SONG = `
-  F#3:0.25,F#3:0.25,C#4:0.25,F#3:0.25,D4:0.25,F#3:0.25,C#4:0.25,F#3:0.25,B3:0.25,A3:0.25,G#3:0.25,A3:0.25,B3:0.25,A3:0.25,G#3:0.25,E3:0.25,
-  F#3:0.25,F#3:0.25,C#4:0.25,F#3:0.25,D4:0.25,F#3:0.25,C#4:0.25,F#3:0.25,D4+D3+A3:1,E4+E3+B3:3
-`;
+const OCTAVE = 12;
+/** Blancas minimas visibles, para que el teclado no se quede en nada. */
+const MIN_KEYS = 10;
+/** Rueda acumulada que hace falta para desplazar una tecla. */
+const WHEEL_STEP = 26;
 
-const REST = 10; // ms de silencio entre notas, para que se distingan las repetidas
+export interface PianoKey extends Key {
+  readonly shortcut: string;
+}
 
 @Component({
   selector: 'app-piano',
-  imports: [Tile],
+  imports: [Tile, Keymap],
   templateUrl: './piano.html',
   styleUrls: ['./piano.scss'],
+  host: {
+    '(window:keydown)': 'press($event)',
+    '(window:keyup)': 'release($event)',
+    '(wheel)': 'scroll($event)',
+  },
 })
 export class Piano {
-  /** Rango que se muestra, en MIDI: por defecto de A3 a G#7. */
-  readonly from = input(57);
-  readonly to = input(104);
+  readonly octaves = input(3);
 
   private readonly synth = inject(Synth);
+  private readonly tiles = viewChildren(Tile);
 
-  readonly keys = computed(() =>
-    pitchesBetween(this.from(), this.to()).map((pitch, i) => ({
-      pitch,
-      shortcut: PIANO_KEYS[i] ?? '',
-    }))
+  /** Primera blanca visible, como indice sobre las 52 del piano. */
+  readonly first = signal(0);
+  readonly size = computed(() => Math.max(MIN_KEYS, Math.round(this.octaves() * 7) + 1));
+
+  readonly whites = computed(() => {
+    const first = Math.max(0, Math.min(WHITE_KEYS.length - this.size(), this.first()));
+
+    return WHITE_KEYS.slice(first, first + this.size());
+  });
+
+  readonly keys = computed<PianoKey[]>(() => {
+    const shortcuts = this.shortcuts();
+
+    return layout(this.whites()).map((key) => ({
+      ...key,
+      shortcut: shortcuts.get(key.pitch.midi) ?? '',
+    }));
+  });
+
+  readonly focused = signal(WHITE_KEYS[0]);
+
+  /**
+   * Tecla que entra en el orden de tabulacion; las flechas mueven el foco entre las
+   * demas. Si la enfocada se sale al desplazar la ventana, entra la primera visible:
+   * el teclado nunca puede quedarse sin punto de entrada.
+   */
+  readonly tabStop = computed(() => {
+    const midis = this.keys().map(({ pitch }) => pitch.midi);
+
+    return midis.includes(this.focused()) ? this.focused() : Math.min(...midis);
+  });
+
+  /** Do desde el que se reparten las teclas del ordenador sobre la ventana visible. */
+  private readonly typingBase = computed(() => {
+    const whites = this.whites();
+    const octaveStart = Math.ceil(whites[0] / OCTAVE) * OCTAVE;
+    const cabe = octaveStart + KEY_MAP_RANGE <= whites[whites.length - 1];
+
+    return cabe ? octaveStart : Math.max(OCTAVE * 2, octaveStart - OCTAVE);
+  });
+
+  private readonly shortcuts = computed(
+    () =>
+      new Map(
+        Object.entries(KEY_MAP).map(([key, semitones]) => [this.typingBase() + semitones, key])
+      )
   );
 
-  async play() {
-    for (const group of SONG.replace(/\s/g, '').split(',')) {
-      const [chord, seconds] = group.split(':');
+  private wheel = 0;
 
-      await this.push(chord, +seconds * 1000 - REST);
-      await wait(REST);
+  /** Desplaza la ventana. Lo que sonara queda huerfano, asi que se suelta antes. */
+  move(keys: number) {
+    const first = Math.max(0, Math.min(WHITE_KEYS.length - this.size(), this.first() + keys));
+
+    if (first === this.first()) return;
+
+    this.synth.panic();
+    this.first.set(first);
+  }
+
+  /** Deja la nota lo mas centrada posible en la ventana. */
+  centerOn(midi: number) {
+    const closest = WHITE_KEYS.reduce(
+      (best, white, i) => (Math.abs(white - midi) < Math.abs(WHITE_KEYS[best] - midi) ? i : best),
+      0
+    );
+
+    this.move(closest - Math.floor(this.size() / 2) - this.first());
+  }
+
+  press(event: KeyboardEvent) {
+    if (event.repeat || event.metaKey || event.ctrlKey || isTyping(event.target)) return;
+
+    const key = event.key.toLowerCase();
+
+    if (key === ' ') {
+      event.preventDefault();
+      this.synth.sustain.set(true);
+
+      return;
+    }
+
+    if (key in SHIFT_KEYS) {
+      this.move(SHIFT_KEYS[key]);
+
+      return;
+    }
+
+    if (!(key in KEY_MAP)) return;
+
+    event.preventDefault();
+    this.synth.noteOn(this.typingBase() + KEY_MAP[key]);
+  }
+
+  release(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+
+    if (key === ' ') {
+      this.synth.sustain.set(false);
+    } else if (key in KEY_MAP) {
+      this.synth.noteOff(this.typingBase() + KEY_MAP[key]);
     }
   }
 
-  /** Pulsa las teclas de una nota o acorde durante `duration` ms. */
-  private async push(chord: string, duration: number) {
-    const names = chord.split('+');
-    const midis = this.keys()
-      .filter(({ pitch }) => names.includes(pitch.name))
-      .map(({ pitch }) => pitch.midi);
+  scroll(event: WheelEvent) {
+    const delta =
+      event.shiftKey ? event.deltaY
+      : Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX
+      : 0;
 
-    midis.forEach((midi) => this.synth.noteOn(midi));
-    await wait(duration);
-    midis.forEach((midi) => this.synth.noteOff(midi));
+    if (!delta) return;
+
+    event.preventDefault();
+    this.wheel += delta;
+
+    while (Math.abs(this.wheel) >= WHEEL_STEP) {
+      this.move(Math.sign(this.wheel));
+      this.wheel -= Math.sign(this.wheel) * WHEEL_STEP;
+    }
+  }
+
+  /** Mueve el foco a la tecla contigua, que es como se recorre un grupo de botones. */
+  moveFocus(steps: number) {
+    const midis = this.keys()
+      .map(({ pitch }) => pitch.midi)
+      .sort((a, b) => a - b);
+    const next = midis[Math.max(0, Math.min(midis.length - 1, midis.indexOf(this.tabStop()) + steps))];
+
+    this.focused.set(next);
+    this.tiles()
+      .find((tile) => tile.key().pitch.midi === next)
+      ?.focus();
   }
 }
 
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+/** Las teclas del piano no deben robarle la escritura a un campo de texto. */
+function isTyping(target: EventTarget | null) {
+  return target instanceof HTMLElement && /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName);
 }
