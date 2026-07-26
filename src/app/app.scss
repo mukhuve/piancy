@@ -30,31 +30,6 @@
   }
 
   .stage {
-    @apply relative flex flex-col flex-1 items-center justify-center gap-1 m-4 mb-0 min-w-0;
-    @apply bg-neutral-100 overflow-hidden;
-
-    h2 {
-      @apply text-2xl text-accent-800;
-    }
-
-    /* lectura de la tonalidad, arriba a la izquierda del escenario */
-    > .reading {
-      @apply absolute top-2 left-3 pointer-events-none;
-    }
-
-    .chord-large {
-      @apply font-heading text-5xl uppercase;
-
-      color: var(--tone-color);
-      letter-spacing: 0.1em;
-    }
-
-    /* halo de lo que suena, hasta que el visualizador ocupe el hueco */
-    &::after {
-      @apply absolute inset-0 pointer-events-none opacity-30;
-
-      content: "";
-      background: radial-gradient(circle at 50% 120%, var(--tone-color), transparent 70%);
-    }
+    @apply flex-1 m-4 mb-0 min-w-0;
   }
 }

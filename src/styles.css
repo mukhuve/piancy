@@ -4,8 +4,13 @@
 @custom-variant dark (.dark &);
 
 /* Tokens del sistema Industry: rampas generadas en OKLCH sobre una misma escala
-   de luminosidad, de modo que el mismo paso de cualquier rampa pesa igual. */
-@theme {
+   de luminosidad, de modo que el mismo paso de cualquier rampa pesa igual.
+
+   `static` publica todas las variables, tambien las que Tailwind no ve usadas: los
+   estilos de componente van en archivos aparte y el visualizador lee sus colores
+   en tiempo de ejecucion, asi que la depuracion automatica se llevaria justo los
+   que hacen falta para pintar. */
+@theme static {
   --color-bg: #f2f2f3;
   --color-surface: #e9e9ea;
   --color-ink: #1d1f20;

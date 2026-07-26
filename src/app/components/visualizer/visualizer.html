@@ -1,0 +1,13 @@
+<i class="corner tl"></i><i class="corner tr"></i>
+<i class="corner bl"></i><i class="corner br"></i>
+
+<canvas #canvas aria-hidden="true"></canvas>
+
+<span class="reading label">{{ reading() }}</span>
+
+@if (!touched()) {
+  <div class="empty">
+    <h2>Press a key to start</h2>
+    <span class="label">Click the keyboard or type A W S E D F · space sustains</span>
+  </div>
+}

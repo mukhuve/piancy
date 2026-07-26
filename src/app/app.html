@@ -40,19 +40,7 @@
 </header>
 
 <div class="body">
-  <main class="blueprint stage">
-    <i class="corner tl"></i><i class="corner tr"></i>
-    <i class="corner bl"></i><i class="corner br"></i>
-
-    <span class="reading label">{{ tonality.name() }}</span>
-
-    @if (playing()) {
-      <span class="chord-large">{{ chord() }}</span>
-    } @else {
-      <h2>Press a key to start</h2>
-      <span class="label">Click the keyboard or type A W S E D F · space sustains</span>
-    }
-  </main>
+  <app-visualizer class="blueprint stage"></app-visualizer>
 
   @if (panel()) {
     <app-synth-panel></app-synth-panel>

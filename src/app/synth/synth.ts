@@ -23,6 +23,8 @@ export class Synth {
 
   private context?: AudioContext;
   private bus?: Bus;
+  private frequencies?: Uint8Array<ArrayBuffer>;
+  private times?: Uint8Array<ArrayBuffer>;
   private readonly voices = new Map<number, Voice>();
   /** Notas ya soltadas que el pedal mantiene sonando. */
   private readonly pedal = new Set<number>();
@@ -44,9 +46,27 @@ export class Synth {
     });
   }
 
-  /** Solo hay analizador desde que suena la primera nota. */
-  get analyser() {
-    return this.bus?.analyser;
+  /**
+   * Lecturas del analizador para quien quiera dibujarlas. Vienen vacias mientras no
+   * haya sonado nada, que es cuando aun no existe el contexto de audio. El buffer
+   * se reaprovecha: se leen sesenta veces por segundo.
+   */
+  spectrum() {
+    if (!this.bus) return undefined;
+
+    this.frequencies ??= new Uint8Array(this.bus.analyser.frequencyBinCount);
+    this.bus.analyser.getByteFrequencyData(this.frequencies);
+
+    return this.frequencies;
+  }
+
+  waveform() {
+    if (!this.bus) return undefined;
+
+    this.times ??= new Uint8Array(this.bus.analyser.fftSize);
+    this.bus.analyser.getByteTimeDomainData(this.times);
+
+    return this.times;
   }
 
   noteOn(midi: number, velocity = 0.85) {
