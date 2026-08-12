@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { I18n } from '../../i18n/i18n';
 import { colorOf, toCss } from '../../music/color';
 import { NOTE_NAMES } from '../../music/pitch';
 import { Tonality } from '../../music/scales';
@@ -18,12 +19,19 @@ const REFERENCE = 60;
 export class Legend {
   private readonly tonality = inject(Tonality);
 
+  protected readonly t = inject(I18n).t;
+
+  /**
+   * Solo las notas de la escala. Las de fuera no llevan color en el teclado, asi que
+   * en la leyenda no explicaban nada: ocupaban sitio, apagadas, para decir que no
+   * eran de aqui. Lo que se lee es la escala en la que se esta tocando.
+   */
   protected readonly notes = computed(() =>
     NOTE_NAMES.map((name, pitchClass) => ({
       name,
-      color: toCss(colorOf(REFERENCE + pitchClass)),
       degree: this.tonality.label(REFERENCE + pitchClass),
-    }))
+      color: toCss(colorOf(REFERENCE + pitchClass)),
+    })).filter(({ degree }) => degree)
   );
 
   protected readonly key = computed(() => this.tonality.name());

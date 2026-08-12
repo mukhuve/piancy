@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, input, signal, viewChildren } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChildren,
+} from '@angular/core';
+import { I18n } from '../../i18n/i18n';
 import { SHIFT_KEYS } from '../../input/computer-keys';
 import { Keyboard } from '../../keyboard/keyboard';
 import { WHITE_KEYS } from '../../music/keyboard';
@@ -24,12 +34,18 @@ const WHEEL_STEP = 26;
 })
 export class Piano {
   readonly octaves = input(3);
+  /** Cual de los paneles laterales esta abierto, para marcar el boton del suyo. */
+  readonly aside = input<string | null>(null);
+
+  /** El boton que lo pide, que es a quien hay que devolverle el foco al cerrar. */
+  readonly asideToggled = output<HTMLElement>();
 
   private readonly synth = inject(Synth);
   private readonly tiles = viewChildren(Tile);
 
   protected readonly keyboard = inject(Keyboard);
   protected readonly settings = inject(Settings);
+  protected readonly t = inject(I18n).t;
 
   readonly focused = signal(WHITE_KEYS[0]);
 

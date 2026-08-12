@@ -49,13 +49,48 @@
       min-width: 5rem;
     }
 
+    /* El metronomo es de toda la app: se oye igual tocando libre que siguiendo una
+       pieza, asi que no puede vivir dentro de la barra de practica, que se apaga. */
+    .metronome {
+      @apply flex items-center gap-1.5 mr-2 pr-3 border-r border-divider;
+
+      /* el mismo alto que el boton de al lado: con su relleno propio el campo salia
+         un par de pixeles mas bajo y las dos cajas no casaban */
+      input {
+        @apply w-14 h-8 px-1.5 py-0 text-sm text-right bg-transparent text-ink border border-divider;
+
+        border-radius: 0;
+        line-height: 1;
+        appearance: textfield;
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          appearance: none;
+          margin: 0;
+        }
+      }
+
+      /* La aguja va y viene al ritmo del pulso: es lo que dice de un vistazo que el
+         metronomo esta puesto y a que velocidad, que solo oyendolo no se sabe. */
+      .needle {
+        transform-origin: 12px 15px;
+        transform: rotate(calc(var(--swing) * 15deg));
+        transition: transform var(--beat) linear;
+      }
+
+      .btn-icon.on {
+        @apply bg-accent-600 text-bg border-accent-600;
+      }
+    }
+
     .btn-icon.on {
       @apply bg-accent-600 text-bg border-accent-600;
     }
   }
 
+  /* marco de los paneles laterales, que se colocan encima sin empujar nada */
   > .body {
-    @apply flex flex-1 min-h-0;
+    @apply relative flex flex-1 min-h-0;
   }
 
   /* columna de trabajo: escenario, teclado y barra del pie, siempre del mismo ancho */
@@ -76,7 +111,7 @@
     }
 
     app-lane,
-    app-lesson {
+    app-coming-soon {
       @apply flex-1 min-h-0;
     }
   }

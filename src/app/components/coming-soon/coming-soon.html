@@ -1,0 +1,27 @@
+<i class="corner tl"></i><i class="corner tr"></i>
+<i class="corner bl"></i><i class="corner br"></i>
+
+<div class="panel">
+  <div class="intro">
+    <span class="label badge">{{ t("soon.badge") }}</span>
+
+    <h2>{{ t("soon.title") }}</h2>
+    <p>{{ t("soon.text") }}</p>
+
+    <span class="note">{{ t("soon.meanwhile") }}</span>
+  </div>
+
+  <ul class="tracks">
+    @for (track of tracks; track track.name) {
+      <li class="track" [style.--delay.ms]="$index * 70">
+        <span class="name">{{ t(track.name) }}</span>
+        <span class="about">{{ t(track.about) }}</span>
+        <span class="levels" aria-hidden="true">
+          @for (level of levels; track level) {
+            <i class="level"></i>
+          }
+        </span>
+      </li>
+    }
+  </ul>
+</div>

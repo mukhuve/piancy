@@ -1,8 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
+import { I18n } from '../../i18n/i18n';
 import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
 import { Player } from '../../transport/player';
-import { BPM_RANGE, Transport as TransportState } from '../../transport/transport';
 
 @Component({
   selector: 'app-transport',
@@ -10,10 +10,9 @@ import { BPM_RANGE, Transport as TransportState } from '../../transport/transpor
   styleUrls: ['./transport.scss'],
 })
 export class Transport {
-  protected readonly transport = inject(TransportState);
   protected readonly player = inject(Player);
   protected readonly synth = inject(Synth);
-  protected readonly range = BPM_RANGE;
+  protected readonly t = inject(I18n).t;
 
   private readonly settings = inject(Settings);
 

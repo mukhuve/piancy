@@ -5,6 +5,24 @@
 
   user-select: none;
 
+  /* La escala a un lado y el instrumento al otro. Vive aunque la leyenda este
+     apagada: el mando del sonido no puede irse con ella. */
+  .bar {
+    @apply flex items-center gap-4 min-w-0 min-h-8;
+
+    app-legend {
+      @apply flex-1 min-w-0;
+    }
+
+    .btn-icon {
+      @apply ml-auto shrink-0;
+
+      &.on {
+        @apply bg-accent-600 text-bg border-accent-600;
+      }
+    }
+  }
+
   /* Marco de referencia de las teclas, que se colocan en absoluto. */
   .keys {
     @apply relative w-full bg-neutral-200 overflow-hidden;

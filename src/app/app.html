@@ -1,5 +1,5 @@
 <header>
-  <h1>Piancy</h1>
+  <h1>{{ t("app.title") }}</h1>
 
   <div class="modes">
     <button
@@ -9,7 +9,7 @@
       [attr.aria-pressed]="isPlay()"
       (click)="settings.mode.set('play')"
     >
-      Play
+      {{ t("mode.play") }}
     </button>
     <button
       class="mode"
@@ -18,48 +18,71 @@
       [attr.aria-pressed]="!isPlay()"
       (click)="settings.mode.set('learn')"
     >
-      Learn
+      {{ t("mode.learn") }}
     </button>
   </div>
 
   <span class="chord">{{ chord() }}</span>
 
-  <button
-    class="btn btn-icon"
-    type="button"
-    title="Sound and synthesis"
-    aria-label="Sound and synthesis"
-    [class.on]="aside() === 'synth'"
-    [attr.aria-pressed]="aside() === 'synth'"
-    (click)="toggleAside('synth')"
+  <!-- el metronomo es de toda la app, no solo de la barra de practica: se oye igual
+       tocando libre que siguiendo una pieza -->
+  <div
+    class="metronome"
+    [style.--swing]="transport.beat() % 2 ? 1 : -1"
+    [style.--beat]="beatSeconds() + 's'"
   >
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-      <path d="M6 4v6M6 14v6M12 4v3M12 11v9M18 4v10M18 18v2"></path>
-      <path d="M4 12h4M10 9h4M16 16h4"></path>
-    </svg>
-  </button>
+    <button
+      class="btn btn-icon"
+      type="button"
+      [title]="t('transport.metronome')"
+      [attr.aria-label]="t('transport.metronome')"
+      [class.on]="transport.metronome()"
+      [attr.aria-pressed]="transport.metronome()"
+      (click)="transport.metronome.set(!transport.metronome())"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M9.5 4h5l3.5 15H6L9.5 4z"></path>
+        <path d="M6 15h12"></path>
+        <path class="needle" d="M12 15L18.5 6"></path>
+      </svg>
+    </button>
+
+    <input
+      id="bpm"
+      type="number"
+      [min]="bpmRange.min"
+      [max]="bpmRange.max"
+      step="1"
+      [value]="transport.bpm()"
+      [attr.aria-label]="t('transport.bpm')"
+      (change)="transport.setBpm(+$any($event.target).value)"
+    />
+    <label class="label" for="bpm">{{ t("transport.bpm") }}</label>
+  </div>
 
   <button
+    #settingsButton
     class="btn btn-icon"
     type="button"
-    title="App settings"
-    aria-label="App settings"
+    [title]="t('header.settings')"
+    [attr.aria-label]="t('header.settings')"
     [class.on]="aside() === 'settings'"
     [attr.aria-pressed]="aside() === 'settings'"
-    (click)="toggleAside('settings')"
+    (click)="toggleAside('settings', settingsButton)"
   >
+    <!-- deslizadores: el engranaje radial no se distinguia del sol del tema -->
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-      <circle cx="12" cy="12" r="3"></circle>
-      <path
-        d="M12 3v2.5M12 18.5V21M4.2 7.5l2.2 1.3M17.6 15.2l2.2 1.3M4.2 16.5l2.2-1.3M17.6 8.8l2.2-1.3"
-      ></path>
+      <path d="M3 7h11M18 7h3M3 12h3M10 12h11M3 17h7M14 17h7"></path>
+      <circle cx="16" cy="7" r="2"></circle>
+      <circle cx="8" cy="12" r="2"></circle>
+      <circle cx="12" cy="17" r="2"></circle>
     </svg>
   </button>
 
   <button
     class="btn btn-icon"
     type="button"
-    [attr.aria-label]="darkmode() ? 'Switch to light theme' : 'Switch to dark theme'"
+    [attr.aria-label]="darkmode() ? t('header.themeLight') : t('header.themeDark')"
     (click)="toggleDarkMode()"
   >
     @if (darkmode()) {
@@ -86,14 +109,14 @@
         <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
 
         @if (hasTrack()) {
-          <app-lane class="blueprint"></app-lane>
+          <app-lane class="blueprint" animate.enter="fade-in"></app-lane>
         }
       } @else {
-        <app-lesson class="blueprint"></app-lesson>
+        <app-coming-soon class="blueprint" animate.enter="fade-in"></app-coming-soon>
       }
     </div>
 
-    <app-piano></app-piano>
+    <app-piano [aside]="aside()" (asideToggled)="toggleAside('synth', $event)"></app-piano>
 
     @if (settings.transport()) {
       <app-transport></app-transport>
@@ -102,10 +125,10 @@
 
   @switch (aside()) {
     @case ('synth') {
-      <app-synth-panel></app-synth-panel>
+      <app-synth-panel class="sheet" animate.enter="slide-in" animate.leave="slide-out" />
     }
     @case ('settings') {
-      <app-settings-panel></app-settings-panel>
+      <app-settings-panel class="sheet" animate.enter="slide-in" animate.leave="slide-out" />
     }
   }
 </div>

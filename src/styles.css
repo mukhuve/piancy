@@ -43,6 +43,10 @@
   --color-key-edge: #b7b7ba;
   --color-key-sharp: #2b2b2d;
   --color-key-sharp-ink: #b7b7ba;
+  /* La negra necesita canto propio: sin borde ni relieve se funde con su sombra y
+     con la vecina, y deja de parecer una pieza que sobresale del teclado. */
+  --color-key-sharp-edge: #1d2d3d;
+  --color-key-sharp-relief: #424244;
 
   --font-heading: "Barlow Condensed", system-ui, sans-serif;
   --font-body: "Barlow", system-ui, sans-serif;
@@ -155,6 +159,61 @@ h3 {
   @apply text-[10px] uppercase text-neutral-700;
 
   letter-spacing: 0.18em;
+}
+
+/* Panel que entra por un lado y se pone encima, sin mover nada de sitio. Lo de
+   debajo tiene que quedarse donde estaba: el carril de notas cae justo sobre las
+   teclas, asi que estrechar la columna al abrir un panel desalinea las dos cosas
+   y obliga a reorientarse cada vez que se toca un mando. */
+.sheet {
+  @apply absolute inset-y-0 right-0 z-20 flex flex-col w-84 max-w-full p-4 overflow-y-auto;
+  @apply bg-bg border-l border-divider;
+
+  box-shadow: var(--shadow-lg);
+}
+
+/* Entradas y salidas de los paneles y los bloques del escenario. Las aplica
+   `animate.enter` / `animate.leave`, que es la animacion que trae Angular: son
+   clases CSS puestas y quitadas por el compilador, sin libreria ninguna de por
+   medio, y el elemento no se retira del DOM hasta que la de salida termina. */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.slide-in {
+  animation: slide-in 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.slide-out {
+  animation: slide-out 180ms cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+.fade-in {
+  animation: fade-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* Quien pide menos movimiento se queda con el cambio de estado, sin el recorrido. */
+@media (prefers-reduced-motion: reduce) {
+  .slide-in,
+  .slide-out,
+  .fade-in {
+    animation-duration: 1ms;
+  }
 }
 
 .btn {

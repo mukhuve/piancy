@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, output } from '@angular/core';
+import { I18n } from '../../i18n/i18n';
 import { WHITE_KEYS } from '../../music/keyboard';
 import { pitchOf } from '../../music/pitch';
 import { Synth } from '../../synth/synth';
@@ -13,12 +14,17 @@ import { Synth } from '../../synth/synth';
   styleUrls: ['./keymap.scss'],
   host: {
     role: 'slider',
-    'aria-label': 'Visible range of the keyboard',
+    tabindex: '0',
+    '[attr.aria-label]': 't("piano.range")',
     '[attr.aria-valuemin]': '0',
     '[attr.aria-valuemax]': 'total - size()',
     '[attr.aria-valuenow]': 'first()',
     '(pointerdown)': 'jump($event)',
     '(pointermove)': 'drag($event)',
+    '(keydown.arrowleft)': 'moved.emit(-1)',
+    '(keydown.arrowright)': 'moved.emit(1)',
+    '(keydown.home)': 'moved.emit(-total)',
+    '(keydown.end)': 'moved.emit(total)',
   },
 })
 export class Keymap {
@@ -28,6 +34,8 @@ export class Keymap {
   readonly moved = output<number>();
 
   readonly total = WHITE_KEYS.length;
+
+  protected readonly t = inject(I18n).t;
 
   private readonly synth = inject(Synth);
 

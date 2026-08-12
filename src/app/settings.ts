@@ -8,6 +8,11 @@ export class Settings {
 
   /** Nombres de nota y grados escritos en las teclas. */
   readonly hints = signal(true);
+  /**
+   * Color por nota. Es una ayuda para diferenciar y recordar, no la unica forma de
+   * leer nada: quien no la quiera se queda con los nombres y los grados.
+   */
+  readonly colour = signal(true);
   /** Barra del transporte al pie. */
   readonly transport = signal(true);
   /** Teclas del ordenador escritas sobre las del piano. */

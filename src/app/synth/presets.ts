@@ -25,6 +25,11 @@ export interface SynthParams {
 }
 
 export const PRESETS = {
+  /* La nota desnuda: un solo oscilador senoidal, sin desafinar contra nada, sin
+     filtro que la recorte, sin saturarla y sin nada detras. Es el patron con el que
+     se mira todo lo demas —la frecuencia se ve entera en el grafico y solo esta ella
+     dentro— y con el que se oye lo que hace cada mando cuando se toca. */
+  'Pure Tone': { oscAType: 'sine', oscBType: 'sine', detune: 0, mix: 0, attack: 0.01, decay: 0.01, sustain: 1, release: 0.12, cutoff: 12000, resonance: 0.1, filtEnv: 0, filtType: 'lowpass', lfoRate: 1, lfoDepth: 0, lfoTarget: 'filter', delayTime: 0.02, delayFb: 0, delayMix: 0, reverbMix: 0, drive: 0 },
   'Glass Piano': { oscAType: 'triangle', oscBType: 'sine', detune: 6, mix: 0.4, attack: 0.004, decay: 0.5, sustain: 0.25, release: 0.7, cutoff: 4200, resonance: 2, filtEnv: 2600, filtType: 'lowpass', lfoRate: 4.5, lfoDepth: 0, lfoTarget: 'filter', delayTime: 0.26, delayFb: 0.24, delayMix: 0.16, reverbMix: 0.3, drive: 0.08 },
   'Steel Pad': { oscAType: 'sawtooth', oscBType: 'sawtooth', detune: 11, mix: 0.5, attack: 0.35, decay: 0.6, sustain: 0.75, release: 1.4, cutoff: 1500, resonance: 5, filtEnv: 1400, filtType: 'lowpass', lfoRate: 0.6, lfoDepth: 420, lfoTarget: 'filter', delayTime: 0.4, delayFb: 0.35, delayMix: 0.24, reverbMix: 0.45, drive: 0.05 },
   Pluck: { oscAType: 'square', oscBType: 'sawtooth', detune: 4, mix: 0.3, attack: 0.002, decay: 0.18, sustain: 0.05, release: 0.22, cutoff: 1800, resonance: 9, filtEnv: 3800, filtType: 'lowpass', lfoRate: 6, lfoDepth: 0, lfoTarget: 'pitch', delayTime: 0.22, delayFb: 0.3, delayMix: 0.22, reverbMix: 0.18, drive: 0.2 },

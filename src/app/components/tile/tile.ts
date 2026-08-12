@@ -1,7 +1,6 @@
 import { Component, ElementRef, computed, inject, input, output } from '@angular/core';
-import { Lessons } from '../../learn/lessons';
 import { PianoKey } from '../../keyboard/keyboard';
-import { colorOf, toCss } from '../../music/color';
+import { colorOf, isPale, toCss } from '../../music/color';
 import { Tonality } from '../../music/scales';
 import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
@@ -14,9 +13,9 @@ import { Synth } from '../../synth/synth';
     role: 'button',
     '[class.black]': 'key().black',
     '[class.active]': 'active()',
+    '[class.pale]': 'pale()',
     '[class.outside]': '!degree()',
-    '[class.target]': 'target()',
-    '[class.wrong]': 'wrong()',
+    '[class.plain]': '!settings.colour()',
     '[style.left.%]': 'key().x * 100',
     '[style.width.%]': 'key().width * 100',
     '[attr.aria-label]': 'key().pitch.name',
@@ -45,21 +44,17 @@ export class Tile {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly synth = inject(Synth);
   private readonly tonality = inject(Tonality);
-  private readonly lessons = inject(Lessons);
 
   protected readonly settings = inject(Settings);
 
   readonly active = computed(() => this.synth.playing().includes(this.key().pitch.midi));
-  readonly color = computed(() => toCss(colorOf(this.key().pitch.midi)));
   readonly degree = computed(() => this.tonality.label(this.key().pitch.midi));
 
-  /** En las lecciones, la tecla que toca pulsar y la que se acaba de fallar. */
-  readonly target = computed(
-    () =>
-      this.settings.mode() === 'learn' && this.lessons.targets().includes(this.key().pitch.midi)
-  );
+  private readonly rgb = computed(() => colorOf(this.key().pitch.midi));
 
-  readonly wrong = computed(() => this.lessons.wrong() === this.key().pitch.midi);
+  readonly color = computed(() => toCss(this.rgb()));
+  /** Sobre los colores claros el texto en claro no se lee; hay que darle la vuelta. */
+  readonly pale = computed(() => isPale(this.rgb()));
 
   focus() {
     this.host.nativeElement.focus();

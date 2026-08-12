@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { I18n } from '../../i18n/i18n';
 import { NOTE_NAMES } from '../../music/pitch';
 import { SCALE_MODES, ScaleMode, Tonality } from '../../music/scales';
 import { SYNTH_GROUPS, SynthControl } from '../../synth/controls';
@@ -13,6 +14,9 @@ import { Synth } from '../../synth/synth';
 export class SynthPanel {
   protected readonly synth = inject(Synth);
   protected readonly tonality = inject(Tonality);
+  /* Los mandos del sintetizador y los nombres de las notas no se traducen: son la
+     nomenclatura del oficio y se escriben igual en cualquier idioma. */
+  protected readonly t = inject(I18n).t;
 
   protected readonly groups = SYNTH_GROUPS;
   protected readonly presets = PRESET_NAMES;

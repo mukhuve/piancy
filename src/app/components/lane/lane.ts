@@ -1,6 +1,7 @@
 import { Component, ElementRef, computed, inject, viewChild } from '@angular/core';
 import { animate, fit, themeReader } from '../../canvas/paint';
 import { Keyboard } from '../../keyboard/keyboard';
+import { Settings } from '../../settings';
 import { Player } from '../../transport/player';
 import { drawCountdown, drawGuides, drawHitLine, drawNotes } from './lane.paint';
 
@@ -17,6 +18,7 @@ export class Lane {
   private readonly keyboard = inject(Keyboard);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly palette = themeReader(this.host.nativeElement, COLORS);
+  private readonly settings = inject(Settings);
 
   protected readonly player = inject(Player);
 
@@ -45,7 +47,8 @@ export class Lane {
           elapsed: this.player.elapsed(),
         },
         colors['neutral-400'],
-        colors['accent-900']
+        colors['accent-900'],
+        this.settings.colour() ? undefined : colors['accent-800']
       );
       drawHitLine(canvas, colors['accent-800']);
       drawCountdown(canvas, this.player.countdown(), colors['accent-800']);

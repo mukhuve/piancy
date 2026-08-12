@@ -29,9 +29,14 @@
     letter-spacing: 0.1em;
   }
 
-  /* las notas de fuera de la tonalidad pesan menos, pero se siguen leyendo */
-  &.outside .name {
-    @apply opacity-60;
+  /* Franja con el color de la nota al pie de la tecla: es la clave de lectura del
+     teclado, y lo que hace que la leyenda signifique algo. Al sonar sobra, porque
+     la tecla entera se pone de ese mismo color. */
+  .band {
+    @apply absolute inset-x-0 bottom-0 h-2.5 pointer-events-none;
+
+    background: var(--key-color);
+    transition: opacity 75ms ease-out;
   }
 
   &:hover {
@@ -47,7 +52,8 @@
 :host(.black) {
   @apply bottom-auto h-[62%] z-20 bg-key-sharp text-key-sharp-ink pb-1.5;
 
-  border-color: var(--color-key-sharp);
+  border-color: var(--color-key-sharp-edge);
+  box-shadow: 0 3px 0 var(--color-key-sharp-relief);
 
   .shortcut {
     @apply w-3.5 h-3.5 text-[8px];
@@ -57,30 +63,69 @@
     @apply text-[11px];
   }
 
+  /* en la negra la franja va arriba, que es su borde libre */
+  .band {
+    @apply bottom-auto top-0 h-[7px];
+  }
+
   &:hover {
     background: color-mix(in srgb, var(--color-key-sharp) 82%, var(--color-accent-400));
   }
 }
 
-/** En las lecciones: la que hay que pulsar se señala, la fallada se apaga. */
-:host(.target) {
-  @apply bg-accent-100;
+/** Fuera de la escala la tecla sigue ahi, pero sin color que la reclame. */
+:host(.outside) {
+  .name {
+    @apply opacity-60;
+  }
 
-  box-shadow: inset 0 0 0 2px var(--color-accent-500);
+  .band {
+    background: var(--color-key-edge);
+  }
 }
 
-:host(.black.target) {
-  box-shadow: inset 0 0 0 2px var(--color-accent-300);
+/**
+ * El gris de la blanca sobre una negra es lo mas claro del teclado y se lleva la
+ * mirada, justo al reves de lo que toca: las de fuera de la escala tienen que
+ * apagarse, no reclamar. Sobre negro el gris que se apaga es el del canto.
+ */
+:host(.black.outside) .band {
+  background: var(--color-key-sharp-relief);
 }
 
-:host(.wrong),
-:host(.black.wrong) {
-  @apply bg-neutral-400 text-neutral-100;
-}
-
-/** La tecla pulsada se pinta con el color de su nota. */
+/** La tecla pulsada se pinta con el color de su nota, y se hunde. */
 :host(.active),
 :host(.black.active) {
-  color: #f5f5f8;
   background: var(--key-color);
+  box-shadow: none;
+  color: var(--color-key);
+
+  .band {
+    @apply opacity-0;
+  }
+}
+
+/**
+ * Los colores de nota recorren el circulo entero y con el su luminancia, asi que la
+ * tinta clara solo vale para la mitad oscura: sobre el amarillo de un sol sostenido
+ * se queda en 1.2:1 y desaparece. El color manda, de modo que cede el texto.
+ */
+:host(.active.pale),
+:host(.black.active.pale) {
+  color: var(--color-key-sharp);
+}
+
+/**
+ * Sin color por nota: la franja se va y la tecla pulsada se marca con el acento del
+ * tema. Lo que dice que nota es siguen siendo su sitio, su nombre y su grado.
+ */
+:host(.plain) .band {
+  @apply hidden;
+}
+
+:host(.plain.active),
+:host(.plain.black.active) {
+  @apply bg-accent-600;
+
+  color: var(--color-key);
 }

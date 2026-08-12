@@ -44,6 +44,45 @@ function lightnessOf(octave: number) {
   return 0.5 + ((octave - MIDDLE_OCTAVE) / MIDDLE_OCTAVE) * SHADE;
 }
 
+/** Luminancia percibida, ponderada por lo que aporta cada canal a la vista (WCAG). */
+function luminanceOf({ r, g, b }: Rgb) {
+  const channel = (value: number) => {
+    const ratio = value / 255;
+
+    return ratio <= 0.04045 ? ratio / 12.92 : ((ratio + 0.055) / 1.055) ** 2.4;
+  };
+
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+}
+
+/**
+ * Las dos unicas tintas que llegan a escribirse sobre un color de nota. Son las
+ * mismas `--color-key` y `--color-key-sharp` de la hoja global, que estan fuera de
+ * la inversion del tema porque el teclado es un objeto fisico.
+ */
+const INKS = [
+  { r: 245, g: 245, b: 248 },
+  { r: 43, g: 43, b: 45 },
+];
+
+/**
+ * Luminancia en la que las dos tintas contrastan igual, que es la media geometrica
+ * de las suyas. Calcularla con las tintas de verdad y no con blanco y negro puros
+ * mueve el punto de 0.18 a 0.22, y con el la eleccion de dos de las doce notas de
+ * la octava central. En el peor caso, justo encima, la tinta elegida sale a 3.6:1.
+ */
+const INK_PIVOT =
+  Math.sqrt(INKS.reduce((product, ink) => product * (luminanceOf(ink) + 0.05), 1)) - 0.05;
+
+/**
+ * Si un color pide tinta oscura encima. Los colores de nota recorren el circulo
+ * entero, y su luminancia con el: el amarillo verdoso de un sol sostenido esta a
+ * 1.2:1 del blanco, ilegible, mientras que el violeta de un mi esta a 6.4:1.
+ */
+export function isPale(color: Rgb) {
+  return luminanceOf(color) > INK_PIVOT;
+}
+
 function hslToRgb(hue: number, saturation: number, lightness: number): Rgb {
   const wrap = (n: number) => (n + hue / 30) % 12;
   const chroma = saturation * Math.min(lightness, 1 - lightness);

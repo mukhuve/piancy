@@ -13,11 +13,6 @@
 
   .note {
     @apply flex flex-col items-center gap-0.5 px-1.5 py-0.5 min-w-0;
-
-    /* las notas de fuera de la tonalidad pesan menos, pero se siguen leyendo */
-    &.outside {
-      @apply opacity-55;
-    }
   }
 
   .swatch {

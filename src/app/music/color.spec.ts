@@ -1,4 +1,4 @@
-import { chordColor, colorOf, toCss } from './color';
+import { Rgb, chordColor, colorOf, isPale, toCss } from './color';
 
 /** Angulo del color en el circulo cromatico, para comparar tonos sin mirar canales. */
 function hueOf({ r, g, b }: { r: number; g: number; b: number }) {
@@ -52,6 +52,37 @@ describe('color', () => {
 
     expect(invertido).toBe(toCss(colorOf(72)));
     expect(hueOf(colorOf(72))).toBeCloseTo(hueOf(colorOf(60)), 0);
+  });
+
+  it('sabe cuando un color pide tinta oscura encima', () => {
+    /** Contraste WCAG entre dos colores, de 1:1 a 21:1. */
+    const contrast = (a: Rgb, b: Rgb) => {
+      const luminance = ({ r, g, b: blue }: Rgb) => {
+        const channel = (v: number) =>
+          v / 255 <= 0.04045 ? v / 255 / 12.92 : ((v / 255 + 0.055) / 1.055) ** 2.4;
+
+        return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(blue);
+      };
+      const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+
+      return (high + 0.05) / (low + 0.05);
+    };
+
+    const ink = { light: { r: 245, g: 245, b: 248 }, dark: { r: 43, g: 43, b: 45 } };
+
+    expect(isPale(colorOf(68))).toBe(true); // sol sostenido, amarillo
+    expect(isPale(colorOf(64))).toBe(false); // mi, violeta
+
+    // en las doce notas de las siete octavas del piano la tinta elegida gana a la
+    // otra, y ninguna baja del 3:1 que pide AA para un texto de este tamaño
+    for (let midi = 24; midi < 96; midi++) {
+      const color = colorOf(midi);
+      const chosen = isPale(color) ? ink.dark : ink.light;
+      const other = isPale(color) ? ink.light : ink.dark;
+
+      expect(contrast(color, chosen)).toBeGreaterThanOrEqual(contrast(color, other));
+      expect(contrast(color, chosen)).toBeGreaterThan(3);
+    }
   });
 
   it('lo que no es un acorde se mezcla, y la mezcla cabe siempre en el canal', () => {

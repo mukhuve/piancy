@@ -1,0 +1,86 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply relative flex items-center bg-neutral-100 overflow-y-auto;
+
+  /* Dos columnas: lo que es, y de que va a constar. En una sola no cabe en el alto
+     del escenario y el temario se cortaba a la mitad, que es justo lo que hay que
+     enseñar entero. */
+  .panel {
+    @apply grid gap-x-10 gap-y-6 w-full max-w-5xl mx-auto px-8 py-6;
+
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  }
+
+  .intro {
+    @apply flex flex-col items-start;
+  }
+
+  .badge {
+    @apply px-2 py-0.5 border border-accent-600 text-accent-700;
+  }
+
+  h2 {
+    @apply text-3xl mt-5 text-accent-800;
+  }
+
+  /* el texto respira por debajo del titulo: pegado, el titulo parece su primera linea */
+  p {
+    @apply mt-3 mb-0 text-[13px] leading-relaxed text-neutral-700;
+  }
+
+  .note {
+    @apply mt-auto pt-5 text-xs text-neutral-600;
+  }
+
+  .tracks {
+    @apply flex flex-col self-center w-full m-0 p-0;
+
+    list-style: none;
+  }
+
+  .track {
+    @apply flex items-baseline gap-3 py-2 border-t border-divider;
+
+    /* entran escalonadas de arriba abajo: el retraso lo pone la plantilla */
+    animation: rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+    animation-delay: var(--delay, 0ms);
+
+    &:last-child {
+      @apply border-b border-divider;
+    }
+
+    .name {
+      @apply font-heading font-semibold uppercase text-sm text-ink shrink-0;
+
+      letter-spacing: 0.12em;
+      min-width: 7rem;
+    }
+
+    .about {
+      @apply flex-1 min-w-0 text-xs leading-snug text-neutral-600;
+    }
+
+    /* los seis niveles de la pista, aun por abrir */
+    .levels {
+      @apply flex gap-1 shrink-0;
+
+      .level {
+        @apply block w-3 h-[3px] bg-neutral-300;
+      }
+    }
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host .track {
+    animation: none;
+  }
+}

@@ -1,32 +1,32 @@
-<h2 class="label">Sound</h2>
+<h2 class="label">{{ t("synth.sound") }}</h2>
 
 <div class="blueprint box">
   <i class="corner tl"></i><i class="corner tr"></i>
   <i class="corner bl"></i><i class="corner br"></i>
 
   <div class="grid">
-    <label for="key-root">Key</label>
+    <label for="key-root">{{ t("synth.key") }}</label>
     <select id="key-root" (change)="tonality.root.set(+$any($event.target).value)">
       @for (note of notes; track note; let i = $index) {
         <option [value]="i" [selected]="i === tonality.root()">{{ note }}</option>
       }
     </select>
 
-    <label for="key-scale">Scale</label>
+    <label for="key-scale">{{ t("synth.scale") }}</label>
     <select id="key-scale" (change)="setMode($any($event.target).value)">
       @for (mode of modes; track mode) {
         <option [value]="mode" [selected]="mode === tonality.mode()">{{ mode }}</option>
       }
     </select>
 
-    <label for="preset">Preset</label>
+    <label for="preset">{{ t("synth.preset") }}</label>
     <select id="preset" (change)="usePreset($any($event.target).value)">
       @for (preset of presets; track preset) {
         <option [value]="preset" [selected]="preset === synth.preset()">{{ preset }}</option>
       }
     </select>
 
-    <label for="master">Master</label>
+    <label for="master">{{ t("synth.master") }}</label>
     <input
       id="master"
       type="range"
@@ -40,9 +40,9 @@
 </div>
 
 <div class="section">
-  <h2 class="label">Synthesis Engine</h2>
+  <h2 class="label">{{ t("synth.engine") }}</h2>
   <button type="button" class="fold-all" (click)="foldAll()">
-    {{ allFolded() ? "Expand all" : "Collapse all" }}
+    {{ allFolded() ? t("synth.expandAll") : t("synth.collapseAll") }}
   </button>
 </div>
 

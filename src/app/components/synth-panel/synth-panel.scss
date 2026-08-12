@@ -1,9 +1,7 @@
 @reference "../../../styles.css";
 
+/* La colocacion y el fondo los pone `.sheet`, que comparte con el otro panel. */
 :host {
-  @apply flex flex-col shrink-0 w-84 p-4 overflow-y-auto;
-  @apply bg-bg border-l border-divider;
-
   .label {
     @apply mb-3;
   }

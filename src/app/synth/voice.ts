@@ -4,11 +4,24 @@ import { SynthParams } from './presets';
 export interface Voice {
   /** Apaga la nota en `release` segundos y desmonta sus nodos al terminar. */
   stop(release: number): void;
+  /**
+   * Su onda a solas, en la ventana de tiempo que se le pida. La ventana viene de
+   * fuera y es la misma para todas las voces a proposito: es lo unico que hace que
+   * un la de 440 se vea con el doble de ciclos que el la de 220 que tiene debajo.
+   */
+  waveform(samples: number): Uint8Array;
 }
 
 /** Un gain nunca llega a cero: `exponentialRamp` no admite el silencio absoluto. */
 const SILENCE = 0.0006;
 const MAX_CUTOFF = 17000;
+
+/**
+ * Cuanto cabe en el osciloscopio de cada voz. A 44.1 kHz son 186 ms, que dan de
+ * sobra para los cuatro ciclos de la nota mas grave del piano y aun dejan margen
+ * para buscarle el punto de disparo.
+ */
+const SCOPE_SIZE = 8192;
 
 /**
  * Dos osciladores desafinados entre si pasan por un filtro con envolvente propia y
@@ -31,6 +44,14 @@ export function playVoice(
   amp.gain.value = 0;
   filter.connect(amp);
   sends.forEach((send) => amp.connect(send));
+
+  /* Se mira la voz seca, antes del bus: la onda que interesa es la de la nota, no la
+     de la mezcla con el eco, la reverb y las demas notas. */
+  const scope = context.createAnalyser();
+  scope.fftSize = SCOPE_SIZE;
+  amp.connect(scope);
+
+  const times = new Uint8Array(scope.fftSize);
 
   const oscillators = ([params.oscAType, params.oscBType] as const).map((type, i) => {
     const oscillator = context.createOscillator();
@@ -67,6 +88,15 @@ export function playVoice(
   [...oscillators, lfo].forEach((oscillator) => oscillator?.start(now));
 
   return {
+    waveform(samples) {
+      scope.getByteTimeDomainData(times);
+
+      const span = Math.max(2, Math.min(times.length, Math.round(samples)));
+      const from = triggerAt(times, times.length - span);
+
+      return times.subarray(from, from + span);
+    },
+
     stop(release) {
       const from = context.currentTime;
       const until = from + Math.max(0.05, release);
@@ -79,6 +109,20 @@ export function playVoice(
       oscillators[0].onended = () => amp.disconnect();
     },
   };
+}
+
+/**
+ * Punto de disparo del osciloscopio: la primera vez que la onda cruza el cero hacia
+ * arriba. Sin el, cada fotograma empieza en una fase distinta y la onda corre por el
+ * lienzo; empezando siempre por el mismo sitio del ciclo, se queda quieta y se puede
+ * mirar. Es lo que hace la perilla de trigger de un osciloscopio de verdad.
+ */
+function triggerAt(data: Uint8Array, limit: number) {
+  for (let i = 1; i < limit; i++) {
+    if (data[i - 1] < 128 && data[i] >= 128) return i;
+  }
+
+  return 0;
 }
 
 function createLfo(

@@ -16,6 +16,13 @@ const CLICK = {
 export class Transport {
   readonly bpm = signal(96);
   readonly metronome = signal(false);
+  /**
+   * Pulso que suena ahora dentro del compas. El metronomo se oye, pero mirando la
+   * pantalla no habia forma de saber si estaba puesto ni por donde iba el compas.
+   */
+  readonly beat = signal(0);
+
+  readonly perBar = CLICK.perBar;
 
   private readonly synth = inject(Synth);
 
@@ -25,12 +32,16 @@ export class Transport {
 
       let beat = 0;
       const timer = setInterval(() => {
-        const { frequency, gain } = beat++ % CLICK.perBar ? CLICK.beat : CLICK.accent;
+        const { frequency, gain } = beat % CLICK.perBar ? CLICK.beat : CLICK.accent;
 
         this.synth.blip(frequency, CLICK.seconds, gain);
+        this.beat.set(beat++ % CLICK.perBar);
       }, 60_000 / this.bpm());
 
-      onCleanup(() => clearInterval(timer));
+      onCleanup(() => {
+        clearInterval(timer);
+        this.beat.set(0);
+      });
     });
   }
 

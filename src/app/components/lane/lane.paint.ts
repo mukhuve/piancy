@@ -42,7 +42,13 @@ export function drawGuides({ ctx, width, height }: Canvas, keys: readonly Key[],
  * Las notas caen hacia la linea de golpeo: cuanto mas lejos esta su momento, mas
  * arriba se dibujan. Las acertadas se apagan y las perdidas pierden el color.
  */
-export function drawNotes(canvas: Canvas, frame: LaneFrame, missed: string, edge: string) {
+export function drawNotes(
+  canvas: Canvas,
+  frame: LaneFrame,
+  missed: string,
+  edge: string,
+  tint?: string
+) {
   const { ctx, width, height } = canvas;
   const { song, states, secondsPerBeat, elapsed } = frame;
   const positions = keyPositions(frame.keys);
@@ -59,7 +65,8 @@ export function drawNotes(canvas: Canvas, frame: LaneFrame, missed: string, edge
     if (bottom < -length || bottom - length > height) return;
 
     ctx.globalAlpha = states[i] === 'hit' ? 0.25 : 1;
-    ctx.fillStyle = states[i] === 'miss' ? missed : toCss(colorOf(note.midi));
+    ctx.fillStyle =
+      states[i] === 'miss' ? missed : (tint ?? toCss(colorOf(note.midi)));
     ctx.fillRect(key.x * width + 2, bottom - length, key.width * width - 4, length);
     ctx.globalAlpha = 1;
 

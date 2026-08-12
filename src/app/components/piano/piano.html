@@ -4,11 +4,32 @@
   (moved)="keyboard.move($event)"
 ></app-keymap>
 
-@if (settings.hints()) {
-  <app-legend></app-legend>
-}
+<!-- la barra de la escala: a la izquierda lo que dice que color es cada nota, y a la
+     derecha del todo el mando del instrumento que las hace sonar -->
+<div class="bar">
+  <!-- la leyenda es la clave de lectura del color: sin color no explica nada -->
+  @if (settings.hints() && settings.colour()) {
+    <app-legend animate.enter="fade-in"></app-legend>
+  }
 
-<div class="keys blueprint" role="group" aria-label="Keyboard">
+  <button
+    #synthButton
+    class="btn btn-icon"
+    type="button"
+    [title]="t('header.sound')"
+    [attr.aria-label]="t('header.sound')"
+    [class.on]="aside() === 'synth'"
+    [attr.aria-pressed]="aside() === 'synth'"
+    (click)="asideToggled.emit(synthButton)"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path d="M6 4v6M6 14v6M12 4v3M12 11v9M18 4v10M18 18v2"></path>
+      <path d="M4 12h4M10 9h4M16 16h4"></path>
+    </svg>
+  </button>
+</div>
+
+<div class="keys blueprint" role="group" [attr.aria-label]="t('piano.keyboard')">
   <i class="corner tl"></i><i class="corner tr"></i>
   <i class="corner bl"></i><i class="corner br"></i>
 

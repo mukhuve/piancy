@@ -1,10 +1,10 @@
-<h2 class="label">App settings</h2>
+<h2 class="label">{{ t("settings.title") }}</h2>
 
 <div class="blueprint box">
   <i class="corner tl"></i><i class="corner tr"></i>
   <i class="corner bl"></i><i class="corner br"></i>
 
-  @for (toggle of toggles; track toggle.label) {
+  @for (toggle of toggles; track toggle.key) {
     <button
       class="item"
       type="button"
@@ -12,13 +12,34 @@
       [attr.aria-pressed]="toggle.state()"
       (click)="toggle.state.set(!toggle.state())"
     >
-      <span>{{ toggle.label }}</span>
-      <span class="state">{{ toggle.state() ? "On" : "Off" }}</span>
+      <span>{{ t(toggle.key) }}</span>
+      <span class="state">{{ toggle.state() ? t("settings.on") : t("settings.off") }}</span>
     </button>
   }
 </div>
 
-<h2 class="label">MIDI</h2>
+<h2 class="label">{{ t("settings.language") }}</h2>
+
+<div class="blueprint box">
+  <i class="corner tl"></i><i class="corner tr"></i>
+  <i class="corner bl"></i><i class="corner br"></i>
+
+  <div class="langs">
+    @for (lang of i18n.languages; track lang) {
+      <button
+        class="lang"
+        type="button"
+        [class.on]="i18n.lang() === lang"
+        [attr.aria-pressed]="i18n.lang() === lang"
+        (click)="i18n.lang.set(lang)"
+      >
+        {{ lang }}
+      </button>
+    }
+  </div>
+</div>
+
+<h2 class="label">{{ t("settings.midi") }}</h2>
 
 <div class="blueprint box">
   <i class="corner tl"></i><i class="corner tr"></i>
@@ -29,11 +50,7 @@
     <span class="label">{{ midi.status() }}</span>
 
     @if (midi.available()) {
-      <button class="link" type="button" (click)="midi.connect()">Connect</button>
+      <button class="link" type="button" (click)="midi.connect()">{{ t("settings.connect") }}</button>
     }
   </div>
 </div>
-
-<h2 class="label">Progress</h2>
-
-<button class="btn" type="button" (click)="lessons.resetProgress()">Reset lesson progress</button>

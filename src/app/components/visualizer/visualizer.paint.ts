@@ -1,5 +1,6 @@
 import { Canvas } from '../../canvas/paint';
 import { colorOf, toCss } from '../../music/color';
+import { Key } from '../../music/keyboard';
 
 const GRID = { columns: 16, rows: 6 };
 const BARS = 64;
@@ -50,48 +51,133 @@ export function drawSpectrum(
   }
 }
 
-/** Una linea por nota sonando, repartidas por altura y en el color de su nota. */
-export function drawVoices({ ctx, width, height }: Canvas, notes: readonly number[]) {
-  if (!notes.length) return;
-
-  const lowest = Math.min(...notes);
-  const highest = Math.max(Math.max(...notes), lowest + 1);
-
+/**
+ * Una linea por nota sonando, cada una plantada sobre su tecla y del color de esa
+ * nota. Cae justo encima porque el lienzo y el teclado miden lo mismo, que es lo
+ * que permite leer el grafico mirando el teclado. Lo que suene fuera de la ventana
+ * visible no se pinta: no hay tecla debajo sobre la que ponerlo.
+ */
+export function drawVoices(
+  { ctx, width, height }: Canvas,
+  keys: readonly Key[],
+  notes: readonly number[],
+  tint?: string
+) {
   ctx.lineWidth = 1;
   ctx.globalAlpha = 0.5;
 
-  notes.forEach((midi) => {
-    const x = Math.round(((midi - lowest) / (highest - lowest)) * width * 0.8 + width * 0.1) + 0.5;
+  keys
+    .filter(({ pitch }) => notes.includes(pitch.midi))
+    .forEach(({ pitch, x, width: keyWidth }) => {
+      ctx.strokeStyle = tint ?? toCss(colorOf(pitch.midi));
+      line(ctx, Math.round((x + keyWidth / 2) * width) + 0.5, 0, undefined, height);
+    });
 
-    ctx.strokeStyle = toCss(colorOf(midi));
-    line(ctx, x, 0, undefined, height);
+  ctx.globalAlpha = 1;
+}
+
+/** Lo que una voz devuelve de si misma para poder dibujarla. */
+export interface VoiceWave {
+  readonly midi: number;
+  readonly wave: Uint8Array;
+}
+
+/** Grosor del trazo de una onda. Es la linea que manda del grafico. */
+const WAVE_WIDTH = 2.2;
+/** Cuanto del alto ocupa una onda a plena pulsacion, de su eje a su cresta. */
+const WAVE_FILL = 0.82;
+/**
+ * Pico al que llega una voz suelta a plena pulsacion, que es el fondo de escala del
+ * grafico. Sin escalar, la onda ocuparia la mitad del sitio que tiene y se veria
+ * mucho mas plana de lo que suena.
+ */
+const VOICE_PEAK = 0.55;
+/** Opacidad de cada onda: por debajo del cruce tienen que verse las dos. */
+const WAVE_ALPHA = 0.75;
+
+/**
+ * Una onda por nota, todas sobre el mismo eje. Una sola linea para todas es la que
+ * sale del bus, o sea la suma: en cuanto suenan dos notas no se distingue ninguna de
+ * las dos. Trazadas aparte y superpuestas se ve que hace cada una —su periodo, su
+ * envolvente, su color— y ademas donde se cruzan, que es lo que hace el acorde.
+ */
+export function drawWaves(
+  { ctx, width, height }: Canvas,
+  voices: readonly VoiceWave[],
+  idle: string,
+  tint?: string
+) {
+  const middle = height / 2;
+
+  ctx.lineWidth = WAVE_WIDTH;
+  ctx.lineJoin = 'round';
+
+  if (!voices.length) {
+    ctx.strokeStyle = idle;
+    line(ctx, 0, Math.round(middle) + 0.5, width, undefined);
+
+    return;
+  }
+
+  const amplitude = middle * WAVE_FILL;
+
+  ctx.globalAlpha = WAVE_ALPHA;
+
+  voices.forEach(({ midi, wave }) => {
+    ctx.strokeStyle = tint ?? toCss(colorOf(midi));
+    ctx.beginPath();
+    trace(ctx, wave, width, middle, amplitude);
+    ctx.stroke();
   });
 
   ctx.globalAlpha = 1;
 }
 
-/** La onda tal cual sale del instrumento, teñida por la nota mas grave. */
-export function drawWave(
-  { ctx, width, height }: Canvas,
-  wave: Uint8Array | undefined,
-  notes: readonly number[],
-  fallback: string
+/** Muestras por pixel de ancho. Mas no se ven, y una nota grave trae miles. */
+const SAMPLES_PER_PIXEL = 2;
+
+/**
+ * La onda, punto a punto y redondeando las esquinas. Uniendo las muestras con rectas
+ * la curva sale poligonal —una nota aguda trae pocas muestras por ciclo y cada una
+ * se estira sobre varios pixeles—, asi que cada muestra pasa a ser el tirador de una
+ * curva cuadratica y el trazo se cierra por el punto medio entre ella y la
+ * siguiente: la linea sale continua sin inventarse nada entre medias.
+ *
+ * La ventana la marca la nota mas grave, y un la grave trae siete mil muestras para
+ * mil y pico pixeles: de esas se toma una de cada tantas, porque dibujar mas puntos
+ * que pixeles no añade nada a lo que se ve y son doce voces por fotograma.
+ */
+function trace(
+  ctx: CanvasRenderingContext2D,
+  wave: Uint8Array,
+  width: number,
+  middle: number,
+  amplitude: number
 ) {
-  if (!wave) return;
+  const step = Math.max(1, Math.ceil(wave.length / (width * SAMPLES_PER_PIXEL)));
+  const at = (i: number) => {
+    const level = Math.max(-1, Math.min(1, (wave[i] - 128) / 128 / VOICE_PEAK));
 
-  ctx.strokeStyle = notes.length ? toCss(colorOf(Math.min(...notes))) : fallback;
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
+    return { x: (i / (wave.length - 1)) * width, y: middle + level * amplitude };
+  };
 
-  for (let i = 0; i < wave.length; i++) {
-    const x = (i / (wave.length - 1)) * width;
-    const y = height * 0.5 + ((wave[i] - 128) / 128) * height * 0.42;
+  let previous = at(0);
 
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
+  ctx.moveTo(previous.x, previous.y);
+
+  for (let i = step; i < wave.length; i += step) {
+    const point = at(i);
+
+    ctx.quadraticCurveTo(
+      previous.x,
+      previous.y,
+      (previous.x + point.x) / 2,
+      (previous.y + point.y) / 2
+    );
+    previous = point;
   }
 
-  ctx.stroke();
+  ctx.lineTo(previous.x, previous.y);
 }
 
 function line(ctx: CanvasRenderingContext2D, x: number, y: number, toX = x, toY = y) {

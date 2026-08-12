@@ -1,9 +1,7 @@
 @reference "../../../styles.css";
 
+/* La colocacion y el fondo los pone `.sheet`, que comparte con el otro panel. */
 :host {
-  @apply flex flex-col shrink-0 w-84 p-4 overflow-y-auto;
-  @apply bg-bg border-l border-divider;
-
   .label {
     @apply mb-3;
   }
@@ -26,6 +24,21 @@
       @apply text-[11px] shrink-0;
 
       letter-spacing: 0.12em;
+    }
+  }
+
+  .langs {
+    @apply flex gap-2;
+
+    .lang {
+      @apply flex-1 py-2 cursor-pointer uppercase;
+      @apply font-heading text-sm text-ink bg-transparent border border-divider;
+
+      letter-spacing: 0.14em;
+
+      &.on {
+        @apply bg-accent-600 text-bg border-accent-600;
+      }
     }
   }
 
