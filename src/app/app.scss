@@ -1,3 +1,4 @@
+@use "../styles/media";
 @reference "../styles.css";
 
 :host {
@@ -5,6 +6,12 @@
 
   /* el color de lo que suena tiñe el escenario */
   --tone-color: transparent;
+
+  /* El movil tumbado tiene la muesca a un lado y la barra de gestos abajo, justo
+     encima del teclado. En cualquier otro sitio esto vale cero y no cambia nada. */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 
   > header {
     @apply relative flex items-center gap-2 px-6 py-2 border-b border-divider shrink-0;
@@ -114,5 +121,82 @@
     app-coming-soon {
       @apply flex-1 min-h-0;
     }
+  }
+
+  /**
+   * Movil tumbado: una sola franja con todo, y el resto del alto para el teclado. En
+   * 390 px de alto cada fila que se deje suelta se la quita a las teclas, asi que la
+   * cabecera pierde el titulo, el metronomo su rotulo y el escenario sus margenes.
+   */
+  @include media.compact {
+    > header {
+      @apply gap-1 px-2 py-1;
+
+      h1 {
+        @apply hidden;
+      }
+
+      .modes {
+        @apply gap-2;
+
+        .mode {
+          @apply py-0 text-xs;
+
+          letter-spacing: 0.1em;
+        }
+      }
+
+      /* la tira del grafico se queda con todo el hueco que dejen los mandos */
+      app-visualizer.scope {
+        @apply flex-1 min-w-0 h-8 mx-1 border border-divider;
+      }
+
+      .chord {
+        @apply mr-1 ml-0 text-xs shrink-0;
+
+        min-width: 3.5rem;
+      }
+
+      .metronome {
+        @apply gap-1 mr-1 pr-1.5;
+
+        input {
+          @apply w-11;
+        }
+
+        /* el rotulo cuesta 38 px y el campo ya dice que es: son numeros y van al lado
+           de la aguja que se mueve */
+        > .label {
+          @apply hidden;
+        }
+      }
+    }
+
+    .stage {
+      @apply gap-2 m-2 mb-0;
+    }
+  }
+}
+
+/**
+ * De pie el teclado no existe, asi que tampoco existe la app: tapa entera en vez de
+ * dar una version peor de si misma. Se va sola al girar, sin nada que pulsar.
+ */
+.rotate {
+  @apply fixed inset-0 z-50 flex flex-col items-center justify-center gap-4;
+  @apply bg-bg text-center px-8;
+
+  svg {
+    @apply w-12 h-12 text-accent-600;
+
+    stroke-width: 1.5;
+  }
+
+  h2 {
+    @apply text-2xl text-accent-800;
+  }
+
+  p {
+    @apply m-0 max-w-xs text-sm text-neutral-700;
   }
 }

@@ -1,3 +1,4 @@
+@use "../../../styles/media";
 @reference "../../../styles.css";
 
 :host {
@@ -128,4 +129,14 @@
   @apply bg-accent-600;
 
   color: var(--color-key);
+}
+
+/**
+ * En un movil no hay teclado de ordenador: la letra no lleva a ninguna parte y le
+ * quita sitio al nombre, que es lo unico que hay que leer mientras se toca.
+ */
+@include media.compact {
+  :host .shortcut {
+    @apply hidden;
+  }
 }

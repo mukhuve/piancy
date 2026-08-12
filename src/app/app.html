@@ -22,6 +22,11 @@
     </button>
   </div>
 
+  <!-- la onda cabe en una tira de 32 px, y de panel se comia un tercio de tecla -->
+  @if (scopeInStrip()) {
+    <app-visualizer class="scope"></app-visualizer>
+  }
+
   <span class="chord">{{ chord() }}</span>
 
   <!-- el metronomo es de toda la app, no solo de la barra de practica: se oye igual
@@ -59,6 +64,42 @@
     />
     <label class="label" for="bpm">{{ t("transport.bpm") }}</label>
   </div>
+
+  <!-- En un movil no hay barra espaciadora que hacer de pedal, ni dedo de sobra para
+       mantenerla mientras se toca: el pedal necesita boton propio y de trinquete. Y el
+       mando del instrumento se sube aqui, porque la barra de la escala no cabe. -->
+  @if (viewport.compact()) {
+    <button
+      class="btn btn-icon"
+      type="button"
+      [title]="t('header.sustain')"
+      [attr.aria-label]="t('header.sustain')"
+      [class.on]="synth.sustain()"
+      [attr.aria-pressed]="synth.sustain()"
+      (click)="synth.sustain.set(!synth.sustain())"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M12 3v8"></path>
+        <path d="M6 13h12a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3z"></path>
+      </svg>
+    </button>
+
+    <button
+      #synthButton
+      class="btn btn-icon"
+      type="button"
+      [title]="t('header.sound')"
+      [attr.aria-label]="t('header.sound')"
+      [class.on]="aside() === 'synth'"
+      [attr.aria-pressed]="aside() === 'synth'"
+      (click)="toggleAside('synth', synthButton)"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M6 4v6M6 14v6M12 4v3M12 11v9M18 4v10M18 18v2"></path>
+        <path d="M4 12h4M10 9h4M16 16h4"></path>
+      </svg>
+    </button>
+  }
 
   <button
     #settingsButton
@@ -98,28 +139,59 @@
       </svg>
     }
   </button>
+
+  <!-- la barra del navegador se come una quinta parte del alto de un movil tumbado, y
+       ese quinto es justo el que le falta al teclado -->
+  @if (viewport.compact() && viewport.fullscreenAvailable) {
+    <button
+      class="btn btn-icon"
+      type="button"
+      [title]="viewport.fullscreen() ? t('header.fullscreenExit') : t('header.fullscreen')"
+      [attr.aria-label]="viewport.fullscreen() ? t('header.fullscreenExit') : t('header.fullscreen')"
+      [attr.aria-pressed]="viewport.fullscreen()"
+      (click)="viewport.toggleFullscreen()"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        @if (viewport.fullscreen()) {
+          <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"></path>
+        } @else {
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>
+        }
+      </svg>
+    </button>
+  }
 </header>
 
 <div class="body">
   <!-- teclado y carril comparten columna: cualquier panel lateral los estrecha a
        la vez y las notas siguen cayendo justo sobre sus teclas -->
   <div class="main">
-    <div class="stage">
-      @if (isPlay()) {
-        <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
+    @if (hasStage()) {
+      <div class="stage">
+        @if (isPlay()) {
+          @if (!scopeInStrip()) {
+            <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
+          }
 
-        @if (hasTrack()) {
-          <app-lane class="blueprint" animate.enter="fade-in"></app-lane>
+          @if (hasTrack()) {
+            <app-lane class="blueprint" animate.enter="fade-in"></app-lane>
+          }
+        } @else {
+          <app-coming-soon class="blueprint" animate.enter="fade-in"></app-coming-soon>
         }
-      } @else {
-        <app-coming-soon class="blueprint" animate.enter="fade-in"></app-coming-soon>
+      </div>
+    }
+
+    @if (!poster()) {
+      <app-piano
+        [octaves]="octaves()"
+        [aside]="aside()"
+        (asideToggled)="toggleAside('synth', $event)"
+      ></app-piano>
+
+      @if (settings.transport()) {
+        <app-transport></app-transport>
       }
-    </div>
-
-    <app-piano [aside]="aside()" (asideToggled)="toggleAside('synth', $event)"></app-piano>
-
-    @if (settings.transport()) {
-      <app-transport></app-transport>
     }
   </div>
 
@@ -132,3 +204,19 @@
     }
   }
 </div>
+
+<!-- De pie no hay diseño que salve un teclado: la tecla blanca se queda en 17 px y no
+     se acierta ninguna. Antes que dar una version peor, se pide girar el telefono. -->
+@if (viewport.portrait()) {
+  <div class="rotate" animate.enter="fade-in">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+      <rect x="8" y="3" width="8" height="18" rx="1.5"></rect>
+      <path d="M11 18.5h2"></path>
+      <path d="M20.5 9.5A8.5 8.5 0 0 0 18 5.6"></path>
+      <path d="m17.4 8.9 3.1.6.6-3.1"></path>
+    </svg>
+
+    <h2>{{ t("rotate.title") }}</h2>
+    <p>{{ t("rotate.text") }}</p>
+  </div>
+}

@@ -10,6 +10,13 @@ export const ES: Texts = {
   'header.settings': 'Ajustes',
   'header.themeLight': 'Cambiar al tema claro',
   'header.themeDark': 'Cambiar al tema oscuro',
+  'header.sustain': 'Pedal de resonancia',
+  'header.fullscreen': 'Pantalla completa',
+  'header.fullscreenExit': 'Salir de pantalla completa',
+
+  'rotate.title': 'Gira el teléfono',
+  'rotate.text':
+    'Un teclado es todo ancho. De pie, la tecla blanca se queda en 17 px y no se acierta ninguna nota; tumbado es un instrumento.',
 
   'piano.keyboard': 'Teclado',
   'piano.range': 'Tramo visible del teclado',

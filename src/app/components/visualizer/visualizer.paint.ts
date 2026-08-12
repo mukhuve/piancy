@@ -2,7 +2,7 @@ import { Canvas } from '../../canvas/paint';
 import { colorOf, toCss } from '../../music/color';
 import { Key } from '../../music/keyboard';
 
-const GRID = { columns: 16, rows: 6 };
+const GRID = { columns: 16, rows: 6, cell: 16 };
 const BARS = 64;
 /** Primeros bins del analizador: son subgraves y solo ensucian el dibujo. */
 const SKIP = 4;
@@ -11,19 +11,31 @@ const SPECTRUM = 3;
 
 /** Retícula de fondo, que es lo que le da al panel su aire de instrumento. */
 export function drawGrid({ ctx, width, height }: Canvas, color: string) {
+  const columns = divisions(width, GRID.columns);
+  const rows = divisions(height, GRID.rows);
+
   ctx.strokeStyle = color;
   ctx.lineWidth = 1;
   ctx.globalAlpha = 0.7;
 
-  for (let i = 1; i < GRID.columns; i++) {
-    line(ctx, Math.round((width * i) / GRID.columns) + 0.5, 0, undefined, height);
+  for (let i = 1; i < columns; i++) {
+    line(ctx, Math.round((width * i) / columns) + 0.5, 0, undefined, height);
   }
 
-  for (let i = 1; i < GRID.rows; i++) {
-    line(ctx, 0, Math.round((height * i) / GRID.rows) + 0.5, width, undefined);
+  for (let i = 1; i < rows; i++) {
+    line(ctx, 0, Math.round((height * i) / rows) + 0.5, width, undefined);
   }
 
   ctx.globalAlpha = 1;
+}
+
+/**
+ * La retícula se afloja cuando el panel se encoge: metida en la franja de un móvil
+ * son 32 px de alto, y seis filas ahí no son una retícula sino un bloque gris. La
+ * casilla nunca baja de `GRID.cell`; con sitio de sobra manda el reparto de siempre.
+ */
+function divisions(size: number, most: number) {
+  return Math.max(1, Math.min(most, Math.floor(size / GRID.cell)));
 }
 
 /** Barras del analizador, cada una con el pico de su tramo de frecuencias. */

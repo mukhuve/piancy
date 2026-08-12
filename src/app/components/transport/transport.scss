@@ -1,3 +1,4 @@
+@use "../../../styles/media";
 @reference "../../../styles.css";
 
 :host {
@@ -49,6 +50,38 @@
 
     &.on {
       @apply bg-accent-600 text-bg border-accent-600;
+    }
+  }
+
+  /**
+   * En movil se encoge todo lo que puede sin dejar de ser tocable: elegir pieza es lo
+   * unico que hace falta aqui. El aviso del pedal se va, que ahora es un boton de la
+   * franja de arriba y dice su estado el solo —ademas de que no hay barra espaciadora
+   * que anunciar.
+   */
+  @include media.compact {
+    @apply h-10 px-2;
+
+    .group {
+      @apply gap-2 px-3;
+    }
+
+    select {
+      @apply h-8 text-xs;
+
+      min-width: 7rem;
+    }
+
+    .btn {
+      @apply px-2 py-1 text-xs;
+    }
+
+    input[type="range"] {
+      @apply w-16;
+    }
+
+    .sustain {
+      @apply hidden;
     }
   }
 }

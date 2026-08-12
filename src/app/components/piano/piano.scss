@@ -1,3 +1,4 @@
+@use "../../../styles/media";
 @reference "../../../styles.css";
 
 :host {
@@ -29,5 +30,29 @@
 
     height: min(200px, 26vh);
     min-height: 88px;
+  }
+
+  /**
+   * En un movil tumbado el teclado es la app, y se queda con todo lo que le dejen: el
+   * grafico se ha ido a la franja de arriba justo para eso. El mapa se queda —es lo
+   * que dice por que trozo del piano se anda— pero mas fino.
+   */
+  @include media.compact {
+    @apply min-h-0 gap-1.5 px-1.5 pt-1 pb-1.5;
+
+    /* con una pieza cargada el carril tambien pide alto, y aun asi manda el teclado:
+       repartido a partes iguales, la tecla se quedaba en 127 px de alto */
+    flex: 1.4;
+
+    app-keymap {
+      @apply h-3;
+    }
+
+    .keys {
+      @apply flex-1;
+
+      height: auto;
+      min-height: 104px;
+    }
   }
 }

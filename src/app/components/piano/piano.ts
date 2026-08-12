@@ -11,6 +11,7 @@ import {
 import { I18n } from '../../i18n/i18n';
 import { SHIFT_KEYS } from '../../input/computer-keys';
 import { Keyboard } from '../../keyboard/keyboard';
+import { Viewport } from '../../layout/viewport';
 import { WHITE_KEYS } from '../../music/keyboard';
 import { Settings } from '../../settings';
 import { Synth } from '../../synth/synth';
@@ -45,6 +46,7 @@ export class Piano {
 
   protected readonly keyboard = inject(Keyboard);
   protected readonly settings = inject(Settings);
+  protected readonly viewport = inject(Viewport);
   protected readonly t = inject(I18n).t;
 
   readonly focused = signal(WHITE_KEYS[0]);

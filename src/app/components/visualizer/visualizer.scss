@@ -22,3 +22,14 @@
     }
   }
 }
+
+/**
+ * Metido en la franja de arriba el grafico es una tira de 32 px: no cabe nada escrito
+ * encima, y tampoco hace falta. Lo que suena esta escrito al lado, en la cabecera.
+ */
+:host(.scope) {
+  .reading,
+  .empty {
+    @apply hidden;
+  }
+}

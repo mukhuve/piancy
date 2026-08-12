@@ -42,6 +42,15 @@ describe('dibujo del visualizador', () => {
     expect(canvas.ctx.globalAlpha).toBe(1); // deja la opacidad como la encontro
   });
 
+  it('la reticula se afloja al encoger el panel, y ninguna casilla baja de 16 px', () => {
+    // la tira de la franja de un movil: seis filas ahi son un bloque gris
+    const { canvas, lines } = spyCanvas(408, 32);
+
+    drawGrid(canvas, '#ccc');
+
+    expect(lines).toHaveLength(15 + 1);
+  });
+
   it('el espectro pinta una barra por tramo, saltandose los tramos vacios', () => {
     const { canvas, rects } = spyCanvas();
     const espectro = new Uint8Array(2048);

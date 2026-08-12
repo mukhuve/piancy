@@ -14,6 +14,13 @@ export const EN = {
   'header.settings': 'App settings',
   'header.themeLight': 'Switch to light theme',
   'header.themeDark': 'Switch to dark theme',
+  'header.sustain': 'Sustain pedal',
+  'header.fullscreen': 'Full screen',
+  'header.fullscreenExit': 'Leave full screen',
+
+  'rotate.title': 'Turn your phone',
+  'rotate.text':
+    'A keyboard is all width. Upright, a white key is 17 px across and you miss every note; lying down it becomes an instrument.',
 
   'piano.keyboard': 'Keyboard',
   'piano.range': 'Visible range of the keyboard',

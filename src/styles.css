@@ -100,6 +100,12 @@ body {
   width: 100svw;
   height: 100svh;
   overflow: hidden;
+  /* En un movil, arrastrar por el teclado recarga la pagina o rebota la vista entera:
+     el gesto es el mismo que el de tirar para actualizar. */
+  overscroll-behavior: none;
+  /* Cada tecla pulsada se cubria de un cuadro gris del sistema, por encima del color
+     de la nota, que es justo lo que hay que ver. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,

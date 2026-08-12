@@ -22,7 +22,7 @@ import { Synth } from '../../synth/synth';
     '[attr.aria-pressed]': 'active()',
     '[attr.tabindex]': 'tabbable() ? 0 : -1',
     '[style.--key-color]': 'color()',
-    '(pointerdown)': 'start()',
+    '(pointerdown)': 'start($event)',
     '(pointerenter)': 'drag($event)',
     '(pointerup)': 'release()',
     '(pointerleave)': 'release()',
@@ -60,10 +60,25 @@ export class Tile {
     this.host.nativeElement.focus();
   }
 
-  start() {
+  start(event?: PointerEvent) {
+    this.releaseCapture(event);
     this.focus();
     this.focused.emit(this.key().pitch.midi);
     this.press();
+  }
+
+  /**
+   * Al tocar con el dedo, la tecla se queda con el puntero: todo lo que venga despues
+   * le llega a ella y no entra en ninguna otra, asi que arrastrar por el teclado no
+   * suena. Soltandolo, el dedo va abriendo y cerrando teclas a su paso, que es el
+   * glissando y la unica forma de tocar rapido en una pantalla.
+   */
+  private releaseCapture(event?: PointerEvent) {
+    const host = this.host.nativeElement;
+
+    if (!event || !host.hasPointerCapture?.(event.pointerId)) return;
+
+    host.releasePointerCapture(event.pointerId);
   }
 
   /** Arrastrar el puntero por el teclado toca, mientras siga pulsado. */
