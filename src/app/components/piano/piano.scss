@@ -1,12 +1,33 @@
 @reference "../../../styles.css";
 
 :host {
-  @apply flex flex-col flex-wrap items-start justify-center p-4 bg-black;
-  @apply rounded-xl shadow-2xl gap-2;
+  @apply flex flex-col gap-3 px-4 pt-2 pb-4 w-full shrink-0;
 
   user-select: none;
-}
 
-:host-context(.dark) {
-  @apply bg-stone-700;
+  /* La escala a un lado y el instrumento al otro. Vive aunque la leyenda este
+     apagada: el mando del sonido no puede irse con ella. */
+  .bar {
+    @apply flex items-center gap-4 min-w-0 min-h-8;
+
+    app-legend {
+      @apply flex-1 min-w-0;
+    }
+
+    .btn-icon {
+      @apply ml-auto shrink-0;
+
+      &.on {
+        @apply bg-accent-600 text-bg border-accent-600;
+      }
+    }
+  }
+
+  /* Marco de referencia de las teclas, que se colocan en absoluto. */
+  .keys {
+    @apply relative w-full bg-neutral-200 overflow-hidden;
+
+    height: min(200px, 26vh);
+    min-height: 88px;
+  }
 }

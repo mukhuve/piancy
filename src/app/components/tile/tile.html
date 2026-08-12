@@ -1,11 +1,11 @@
-<strong>
-  {{ note().label }}
-</strong>
-@if (!note().sharp) {
-  <small class="text-black text-[0.5rem] pointer-events-none mb-1 dark:text-gold-light">
-    {{ note().frequency | number : "1.1-1" }}
-  </small>
+@if (settings.typing() && key().shortcut) {
+  <small class="shortcut">{{ key().shortcut }}</small>
 }
-<small class="key">
-  {{ note().key || "×" }}
-</small>
+@if (settings.hints() && degree()) {
+  <strong class="degree">{{ degree() }}</strong>
+}
+@if (settings.hints() && !key().black) {
+  <small class="name">{{ key().pitch.name }}</small>
+}
+
+<span class="band"></span>

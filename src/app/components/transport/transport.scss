@@ -1,0 +1,54 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply flex items-stretch shrink-0 h-12 px-6 border-t border-divider overflow-hidden;
+
+  .group {
+    @apply flex items-center gap-3 px-6 shrink-0 whitespace-nowrap border-l border-divider;
+
+    &:first-child {
+      @apply pl-0 border-l-0;
+    }
+  }
+
+  .sustain {
+    @apply ml-auto pr-0;
+  }
+
+  input[type="number"] {
+    @apply w-16 h-9 px-1 text-center font-heading text-base bg-bg text-ink border border-divider;
+
+    border-radius: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  select {
+    @apply h-9 px-1.5 text-[13px] bg-bg text-ink border border-divider;
+
+    border-radius: 0;
+    min-width: 9rem;
+  }
+
+  input[type="range"] {
+    @apply w-24;
+
+    accent-color: var(--color-accent-600);
+  }
+
+  .figure {
+    @apply font-heading text-base w-11;
+
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pill {
+    @apply inline-flex items-center h-9 px-3 font-heading text-[11px] uppercase;
+    @apply border border-divider text-neutral-700;
+
+    letter-spacing: 0.14em;
+
+    &.on {
+      @apply bg-accent-600 text-bg border-accent-600;
+    }
+  }
+}

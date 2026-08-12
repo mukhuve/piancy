@@ -1,35 +1,261 @@
-@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* el modo oscuro se activa con la clase .dark en <html> */
 @custom-variant dark (.dark &);
 
-@theme {
-  --color-white: #fffbeb;
-  --color-black: #393e41;
-  --color-gold-regular: #ffd52e;
-  --color-gold-light: #efe0a4;
-  --color-gold-dark: #d1a700;
-  --color-green: #4caf50;
-  --color-red: #f44336;
+/* Tokens del sistema Industry: rampas generadas en OKLCH sobre una misma escala
+   de luminosidad, de modo que el mismo paso de cualquier rampa pesa igual.
+
+   `static` publica todas las variables, tambien las que Tailwind no ve usadas: los
+   estilos de componente van en archivos aparte y el visualizador lee sus colores
+   en tiempo de ejecucion, asi que la depuracion automatica se llevaria justo los
+   que hacen falta para pintar. */
+@theme static {
+  --color-bg: #f2f2f3;
+  --color-surface: #e9e9ea;
+  --color-ink: #1d1f20;
+  --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+  --color-neutral-100: #f5f5f8;
+  --color-neutral-200: #e7e7ea;
+  --color-neutral-300: #d4d4d7;
+  --color-neutral-400: #b7b7ba;
+  --color-neutral-500: #98989b;
+  --color-neutral-600: #7a7a7d;
+  --color-neutral-700: #5d5d60;
+  --color-neutral-800: #424244;
+  --color-neutral-900: #2b2b2d;
+
+  --color-accent-100: #eef6ff;
+  --color-accent-200: #d6ebff;
+  --color-accent-300: #b5d9fd;
+  --color-accent-400: #94bce3;
+  --color-accent-500: #749dc4;
+  --color-accent-600: #597ea3;
+  --color-accent-700: #416180;
+  --color-accent-800: #2c455d;
+  --color-accent-900: #1d2d3d;
+
+  /* El teclado es un objeto fisico: ni sus teclas ni lo escrito en ellas se
+     invierten con el tema, o el texto acabaria del color de su propia tecla. */
+  --color-key: #f5f5f8;
+  --color-key-ink: #5d5d60;
+  --color-key-edge: #b7b7ba;
+  --color-key-sharp: #2b2b2d;
+  --color-key-sharp-ink: #b7b7ba;
+  /* La negra necesita canto propio: sin borde ni relieve se funde con su sombra y
+     con la vecina, y deja de parecer una pieza que sobresale del teclado. */
+  --color-key-sharp-edge: #1d2d3d;
+  --color-key-sharp-relief: #424244;
+
+  --font-heading: "Barlow Condensed", system-ui, sans-serif;
+  --font-body: "Barlow", system-ui, sans-serif;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #2b2b2d 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #2b2b2d 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #2b2b2d 22%, transparent);
+}
+
+/* En oscuro se invierte el suelo y la rampa neutra; el acento ya funciona en
+   ambos, solo cambia el paso que se usa. */
+.dark {
+  --color-bg: #1d1f20;
+  --color-surface: #2b2b2d;
+  --color-ink: #f5f5f8;
+  --color-divider: color-mix(in srgb, #f5f5f8 18%, transparent);
+
+  --color-neutral-100: #2b2b2d;
+  --color-neutral-200: #424244;
+  --color-neutral-300: #5d5d60;
+  --color-neutral-400: #7a7a7d;
+  --color-neutral-500: #98989b;
+  --color-neutral-600: #b7b7ba;
+  --color-neutral-700: #d4d4d7;
+  --color-neutral-800: #e7e7ea;
+  --color-neutral-900: #f5f5f8;
+
+  --color-accent-100: #1d2d3d;
+  --color-accent-200: #2c455d;
+  --color-accent-300: #416180;
+  --color-accent-400: #597ea3;
+  --color-accent-500: #749dc4;
+  --color-accent-600: #94bce3;
+  --color-accent-700: #b5d9fd;
+  --color-accent-800: #d6ebff;
+  --color-accent-900: #eef6ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  @apply bg-gray-100 flex flex-row items-center justify-center dark:bg-black dark:text-white;
-  font-size: 16px;
+  @apply bg-bg text-ink font-body;
+
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
   width: 100svw;
   height: 100svh;
-
-  * {
-    box-sizing: border-box;
-  }
+  overflow: hidden;
 }
 
 h1,
-h2 {
-  font-family: "Dancing Script", cursive;
+h2,
+h3 {
+  @apply font-heading font-semibold uppercase;
+
+  letter-spacing: 0.08em;
+  line-height: 1.12;
+  margin: 0;
 }
 
-button.btn {
-  @apply rounded-lg shadow-md flex flex-row items-center justify-center;
+/* Marco de plano: caja de esquinas rectas con marcas de registro en las cuatro
+   esquinas. Es el objeto basico del sistema; lleva cuatro <i class="corner">. */
+.blueprint {
+  @apply relative border border-divider;
+
+  border-radius: 0;
+
+  > .corner {
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      background: currentColor;
+    }
+
+    &::before {
+      left: 5px;
+      top: 0;
+      width: 1px;
+      height: 100%;
+    }
+
+    &::after {
+      top: 5px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+    }
+
+    &.tl { top: -6px; left: -6px; }
+    &.tr { top: -6px; right: -6px; }
+    &.bl { bottom: -6px; left: -6px; }
+    &.br { bottom: -6px; right: -6px; }
+  }
+}
+
+/* Etiqueta de plano: el texto pequeño en versal y muy espaciado del sistema. El
+   sistema lo pinta en neutral-600, que a este tamaño se queda por debajo de AA. */
+.label {
+  @apply text-[10px] uppercase text-neutral-700;
+
+  letter-spacing: 0.18em;
+}
+
+/* Panel que entra por un lado y se pone encima, sin mover nada de sitio. Lo de
+   debajo tiene que quedarse donde estaba: el carril de notas cae justo sobre las
+   teclas, asi que estrechar la columna al abrir un panel desalinea las dos cosas
+   y obliga a reorientarse cada vez que se toca un mando. */
+.sheet {
+  @apply absolute inset-y-0 right-0 z-20 flex flex-col w-84 max-w-full p-4 overflow-y-auto;
+  @apply bg-bg border-l border-divider;
+
+  box-shadow: var(--shadow-lg);
+}
+
+/* Entradas y salidas de los paneles y los bloques del escenario. Las aplica
+   `animate.enter` / `animate.leave`, que es la animacion que trae Angular: son
+   clases CSS puestas y quitadas por el compilador, sin libreria ninguna de por
+   medio, y el elemento no se retira del DOM hasta que la de salida termina. */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.slide-in {
+  animation: slide-in 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.slide-out {
+  animation: slide-out 180ms cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+.fade-in {
+  animation: fade-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* Quien pide menos movimiento se queda con el cambio de estado, sin el recorrido. */
+@media (prefers-reduced-motion: reduce) {
+  .slide-in,
+  .slide-out,
+  .fade-in {
+    animation-duration: 1ms;
+  }
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-1.5 cursor-pointer;
+  @apply font-heading font-semibold text-sm text-ink;
+  @apply border border-divider bg-transparent px-3 py-1.5;
+
+  border-radius: 0;
+
+  &:hover {
+    @apply bg-accent-100;
+  }
+
+  &:active {
+    @apply bg-accent-200;
+  }
+}
+
+.btn-primary {
+  @apply bg-accent-600 text-bg border-accent-600;
+
+  &:hover {
+    @apply bg-accent-700 border-accent-700;
+  }
+}
+
+.btn-icon {
+  @apply w-8 h-8 p-0;
+
+  svg {
+    @apply w-[17px] h-[17px];
+
+    stroke-width: 1.5;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-600);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-accent-200);
+  color: var(--color-accent-900);
 }

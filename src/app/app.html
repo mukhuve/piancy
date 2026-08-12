@@ -1,24 +1,134 @@
-<header class="w-full absolute top-0 flex justify-end items-center p-3">
-  <a
-    class="mr-auto font-bold text-inherit hover:text-gold-dark dark:hover:text-gold-light"
-    href="https://github.com/mukhuve/piancy"
-    target="_blank"
+<header>
+  <h1>{{ t("app.title") }}</h1>
+
+  <div class="modes">
+    <button
+      class="mode"
+      type="button"
+      [class.on]="isPlay()"
+      [attr.aria-pressed]="isPlay()"
+      (click)="settings.mode.set('play')"
+    >
+      {{ t("mode.play") }}
+    </button>
+    <button
+      class="mode"
+      type="button"
+      [class.on]="!isPlay()"
+      [attr.aria-pressed]="!isPlay()"
+      (click)="settings.mode.set('learn')"
+    >
+      {{ t("mode.learn") }}
+    </button>
+  </div>
+
+  <span class="chord">{{ chord() }}</span>
+
+  <!-- el metronomo es de toda la app, no solo de la barra de practica: se oye igual
+       tocando libre que siguiendo una pieza -->
+  <div
+    class="metronome"
+    [style.--swing]="transport.beat() % 2 ? 1 : -1"
+    [style.--beat]="beatSeconds() + 's'"
   >
-    <h2 class="text-4xl">&#64;mukhuve/piancy</h2>
-  </a>
+    <button
+      class="btn btn-icon"
+      type="button"
+      [title]="t('transport.metronome')"
+      [attr.aria-label]="t('transport.metronome')"
+      [class.on]="transport.metronome()"
+      [attr.aria-pressed]="transport.metronome()"
+      (click)="transport.metronome.set(!transport.metronome())"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M9.5 4h5l3.5 15H6L9.5 4z"></path>
+        <path d="M6 15h12"></path>
+        <path class="needle" d="M12 15L18.5 6"></path>
+      </svg>
+    </button>
+
+    <input
+      id="bpm"
+      type="number"
+      [min]="bpmRange.min"
+      [max]="bpmRange.max"
+      step="1"
+      [value]="transport.bpm()"
+      [attr.aria-label]="t('transport.bpm')"
+      (change)="transport.setBpm(+$any($event.target).value)"
+    />
+    <label class="label" for="bpm">{{ t("transport.bpm") }}</label>
+  </div>
+
   <button
-    class="btn bg-black text-white p-4 dark:bg-white dark:text-black"
+    #settingsButton
+    class="btn btn-icon"
+    type="button"
+    [title]="t('header.settings')"
+    [attr.aria-label]="t('header.settings')"
+    [class.on]="aside() === 'settings'"
+    [attr.aria-pressed]="aside() === 'settings'"
+    (click)="toggleAside('settings', settingsButton)"
+  >
+    <!-- deslizadores: el engranaje radial no se distinguia del sol del tema -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path d="M3 7h11M18 7h3M3 12h3M10 12h11M3 17h7M14 17h7"></path>
+      <circle cx="16" cy="7" r="2"></circle>
+      <circle cx="8" cy="12" r="2"></circle>
+      <circle cx="12" cy="17" r="2"></circle>
+    </svg>
+  </button>
+
+  <button
+    class="btn btn-icon"
+    type="button"
+    [attr.aria-label]="darkmode() ? t('header.themeLight') : t('header.themeDark')"
     (click)="toggleDarkMode()"
   >
-    <i class="material-icons-round">
-      {{ darkmode() ? "wb_sunny" : "dark_mode" }}
-    </i>
+    @if (darkmode()) {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+        ></path>
+      </svg>
+    } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+      </svg>
+    }
   </button>
 </header>
-<app-piano
-  #piano
-  [base]="3"
-  [octaves]="4"
-  (played)="colorize($event)"
-></app-piano>
-<div class="ind" [class.active]="piano.active()"></div>
+
+<div class="body">
+  <!-- teclado y carril comparten columna: cualquier panel lateral los estrecha a
+       la vez y las notas siguen cayendo justo sobre sus teclas -->
+  <div class="main">
+    <div class="stage">
+      @if (isPlay()) {
+        <app-visualizer class="blueprint" [class.compact]="hasTrack()"></app-visualizer>
+
+        @if (hasTrack()) {
+          <app-lane class="blueprint" animate.enter="fade-in"></app-lane>
+        }
+      } @else {
+        <app-coming-soon class="blueprint" animate.enter="fade-in"></app-coming-soon>
+      }
+    </div>
+
+    <app-piano [aside]="aside()" (asideToggled)="toggleAside('synth', $event)"></app-piano>
+
+    @if (settings.transport()) {
+      <app-transport></app-transport>
+    }
+  </div>
+
+  @switch (aside()) {
+    @case ('synth') {
+      <app-synth-panel class="sheet" animate.enter="slide-in" animate.leave="slide-out" />
+    }
+    @case ('settings') {
+      <app-settings-panel class="sheet" animate.enter="slide-in" animate.leave="slide-out" />
+    }
+  }
+</div>

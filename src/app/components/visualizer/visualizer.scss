@@ -1,0 +1,24 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply relative block bg-neutral-100 overflow-hidden;
+
+  canvas {
+    @apply absolute inset-0 block w-full h-full;
+  }
+
+  .reading {
+    @apply absolute top-2 left-3 z-10 pointer-events-none;
+  }
+
+  /* el titulo y su linea de ayuda necesitan aire entre medias: pegados se leen como
+     un solo bloque y el subtitulo parece la segunda linea del titulo */
+  .empty {
+    @apply absolute inset-0 z-10 flex flex-col items-center justify-center gap-3;
+    @apply pointer-events-none text-center px-4;
+
+    h2 {
+      @apply text-2xl text-accent-800;
+    }
+  }
+}

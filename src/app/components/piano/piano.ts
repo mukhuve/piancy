@@ -1,74 +1,145 @@
-import { Component, computed, input, output, signal, viewChildren } from '@angular/core';
-import { Note } from '../../helpers/note';
-import { chromaticMinor } from '../../helpers/scales';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChildren,
+} from '@angular/core';
+import { I18n } from '../../i18n/i18n';
+import { SHIFT_KEYS } from '../../input/computer-keys';
+import { Keyboard } from '../../keyboard/keyboard';
+import { WHITE_KEYS } from '../../music/keyboard';
+import { Settings } from '../../settings';
+import { Synth } from '../../synth/synth';
+import { Keymap } from '../keymap/keymap';
+import { Legend } from '../legend/legend';
 import { Tile } from '../tile/tile';
 
-/** Notas sonando ahora y el rango de frecuencias del teclado que las produce. */
-export interface PianoNotes {
-  notes: number[];
-  range: [number, number];
-}
-
-/** Intro de Crazy Train. Formato `NOTA:segundos`, acordes con `+`. */
-const SONG = `
-  F#3:0.25,F#3:0.25,C#4:0.25,F#3:0.25,D4:0.25,F#3:0.25,C#4:0.25,F#3:0.25,B3:0.25,A3:0.25,G#3:0.25,A3:0.25,B3:0.25,A3:0.25,G#3:0.25,E3:0.25,
-  F#3:0.25,F#3:0.25,C#4:0.25,F#3:0.25,D4:0.25,F#3:0.25,C#4:0.25,F#3:0.25,D4+D3+A3:1,E4+E3+B3:3
-`;
-
-const REST = 10; // ms de silencio entre notas, para que se distingan las repetidas
+/** Rueda acumulada que hace falta para desplazar una tecla. */
+const WHEEL_STEP = 26;
 
 @Component({
   selector: 'app-piano',
-  imports: [Tile],
+  imports: [Tile, Keymap, Legend],
   templateUrl: './piano.html',
   styleUrls: ['./piano.scss'],
+  host: {
+    '(window:keydown)': 'press($event)',
+    '(window:keyup)': 'release($event)',
+    '(wheel)': 'scroll($event)',
+  },
 })
 export class Piano {
   readonly octaves = input(3);
-  readonly base = input(3);
+  /** Cual de los paneles laterales esta abierto, para marcar el boton del suyo. */
+  readonly aside = input<string | null>(null);
 
-  readonly played = output<PianoNotes>();
+  /** El boton que lo pide, que es a quien hay que devolverle el foco al cerrar. */
+  readonly asideToggled = output<HTMLElement>();
 
-  readonly notes = computed(() => chromaticMinor(this.base(), this.octaves()));
-  readonly playing = signal<number[]>([]);
-  readonly active = computed(() => this.playing().length > 0);
-
+  private readonly synth = inject(Synth);
   private readonly tiles = viewChildren(Tile);
 
-  private readonly range = computed<[number, number]>(() => {
-    const notes = this.notes();
+  protected readonly keyboard = inject(Keyboard);
+  protected readonly settings = inject(Settings);
+  protected readonly t = inject(I18n).t;
 
-    return [notes[0].frequency, notes[notes.length - 1].frequency];
+  readonly focused = signal(WHITE_KEYS[0]);
+
+  /**
+   * Tecla que entra en el orden de tabulacion; las flechas mueven el foco entre las
+   * demas. Si la enfocada se sale al desplazar la ventana, entra la primera visible:
+   * el teclado nunca puede quedarse sin punto de entrada.
+   */
+  readonly tabStop = computed(() => {
+    const midis = this.keyboard.keys().map(({ pitch }) => pitch.midi);
+
+    return midis.includes(this.focused()) ? this.focused() : Math.min(...midis);
   });
 
-  actived({ frequency }: Note, active: boolean) {
-    this.playing.update((playing) =>
-      active ? [...playing, frequency] : playing.filter((note) => note !== frequency)
-    );
-    this.played.emit({ notes: this.playing(), range: this.range() });
+  private wheel = 0;
+
+  constructor() {
+    effect(() => this.keyboard.octaves.set(this.octaves()));
   }
 
-  async play() {
-    for (const group of SONG.replace(/\s/g, '').split(',')) {
-      const [note, seconds] = group.split(':');
-      const duration = +seconds * 1000;
+  press(event: KeyboardEvent) {
+    if (event.repeat || event.metaKey || event.ctrlKey || isTyping(event.target)) return;
 
-      await this.push(note, duration - REST);
-      await wait(REST);
+    const key = event.key.toLowerCase();
+
+    if (key === ' ') {
+      event.preventDefault();
+      this.synth.sustain.set(true);
+
+      return;
+    }
+
+    if (key in SHIFT_KEYS) {
+      this.keyboard.move(SHIFT_KEYS[key]);
+
+      return;
+    }
+
+    const midi = this.keyboard.midiFor(key);
+
+    if (midi === undefined) return;
+
+    event.preventDefault();
+    this.synth.noteOn(midi);
+  }
+
+  release(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+
+    if (key === ' ') {
+      this.synth.sustain.set(false);
+
+      return;
+    }
+
+    const midi = this.keyboard.midiFor(key);
+
+    if (midi !== undefined) this.synth.noteOff(midi);
+  }
+
+  scroll(event: WheelEvent) {
+    const delta =
+      event.shiftKey ? event.deltaY
+      : Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX
+      : 0;
+
+    if (!delta) return;
+
+    event.preventDefault();
+    this.wheel += delta;
+
+    while (Math.abs(this.wheel) >= WHEEL_STEP) {
+      this.keyboard.move(Math.sign(this.wheel));
+      this.wheel -= Math.sign(this.wheel) * WHEEL_STEP;
     }
   }
 
-  /** Pulsa las teclas de una nota o acorde durante `duration` ms. */
-  private async push(note: string, duration: number) {
-    const chord = note.split('+');
-    const tiles = this.tiles().filter((tile) => chord.includes(tile.note().name));
+  /** Mueve el foco a la tecla contigua, que es como se recorre un grupo de botones. */
+  moveFocus(steps: number) {
+    const midis = this.keyboard
+      .keys()
+      .map(({ pitch }) => pitch.midi)
+      .sort((a, b) => a - b);
+    const next =
+      midis[Math.max(0, Math.min(midis.length - 1, midis.indexOf(this.tabStop()) + steps))];
 
-    tiles.forEach((tile) => tile.push(true));
-    await wait(duration);
-    tiles.forEach((tile) => tile.push(false));
+    this.focused.set(next);
+    this.tiles()
+      .find((tile) => tile.key().pitch.midi === next)
+      ?.focus();
   }
 }
 
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+/** Las teclas del piano no deben robarle la escritura a un campo de texto. */
+function isTyping(target: EventTarget | null) {
+  return target instanceof HTMLElement && /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName);
 }

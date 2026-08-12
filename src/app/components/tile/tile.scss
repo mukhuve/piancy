@@ -1,47 +1,131 @@
 @reference "../../../styles.css";
 
 :host {
-  @apply relative flex flex-col items-center justify-end p-2 w-12 h-32 transition-all duration-75 ease-out;
-  @apply border-none bg-white shadow-lg font-bold cursor-pointer overflow-hidden;
-  @apply text-black/70 hover:text-black;
+  @apply absolute top-0 bottom-0 z-10 flex flex-col items-center justify-end gap-1 pb-2;
+  @apply bg-key text-key-ink border border-key-edge cursor-pointer overflow-hidden;
+  @apply transition-colors duration-75 ease-out;
 
-  border-radius: 0 0 0.25rem 0.25rem;
+  border-radius: 0;
   user-select: none;
+  touch-action: none;
 
-  strong, small {
-    user-select: none;
-    pointer-events: none;
+  .shortcut {
+    @apply flex items-center justify-center w-4 h-4 text-[9px] uppercase;
+
+    border: 1px solid currentColor;
+    opacity: 0.65;
+    letter-spacing: 0.08em;
   }
 
-  .key {
-    @apply w-6 h-6 rounded-xs flex items-center justify-center text-xs;
-    @apply pointer-events-none bg-stone-900/30 text-inherit;
+  .degree {
+    @apply font-heading text-base;
+
+    letter-spacing: 0.04em;
+  }
+
+  .name {
+    @apply text-[10px];
+
+    letter-spacing: 0.1em;
+  }
+
+  /* Franja con el color de la nota al pie de la tecla: es la clave de lectura del
+     teclado, y lo que hace que la leyenda signifique algo. Al sonar sobra, porque
+     la tecla entera se pone de ese mismo color. */
+  .band {
+    @apply absolute inset-x-0 bottom-0 h-2.5 pointer-events-none;
+
+    background: var(--key-color);
+    transition: opacity 75ms ease-out;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-key) 88%, var(--color-accent-500));
+  }
+
+  &:focus-visible {
+    outline-offset: -3px;
   }
 }
 
-:host[sharp="true"] {
-  @apply w-6 h-[5rem] bg-stone-700 z-10 items-center p-0 shadow-xs pb-2;
-  @apply text-white/70 hover:text-white;
+/** Las negras cuelgan de arriba: mas estrechas, mas cortas y por encima. */
+:host(.black) {
+  @apply bottom-auto h-[62%] z-20 bg-key-sharp text-key-sharp-ink pb-1.5;
 
-  margin-left: -0.9rem;
-  margin-right: -0.8rem;
+  border-color: var(--color-key-sharp-edge);
+  box-shadow: 0 3px 0 var(--color-key-sharp-relief);
 
-  .key {
-    @apply w-3 h-3;
-    font-size: 0.5rem;
+  .shortcut {
+    @apply w-3.5 h-3.5 text-[8px];
+  }
+
+  .degree {
+    @apply text-[11px];
+  }
+
+  /* en la negra la franja va arriba, que es su borde libre */
+  .band {
+    @apply bottom-auto top-0 h-[7px];
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-key-sharp) 82%, var(--color-accent-400));
   }
 }
 
-:host-context(.dark) {
-  &:not(.active) {
-    @apply bg-black/40 text-white/70 hover:text-white;
+/** Fuera de la escala la tecla sigue ahi, pero sin color que la reclame. */
+:host(.outside) {
+  .name {
+    @apply opacity-60;
   }
 
-  &[sharp="true"]:not(.active) {
-    @apply bg-gold-light text-stone-700/70 hover:text-stone-700;
+  .band {
+    background: var(--color-key-edge);
   }
 }
 
-:host.active {
-  @apply bg-green text-white shadow-xl;
+/**
+ * El gris de la blanca sobre una negra es lo mas claro del teclado y se lleva la
+ * mirada, justo al reves de lo que toca: las de fuera de la escala tienen que
+ * apagarse, no reclamar. Sobre negro el gris que se apaga es el del canto.
+ */
+:host(.black.outside) .band {
+  background: var(--color-key-sharp-relief);
+}
+
+/** La tecla pulsada se pinta con el color de su nota, y se hunde. */
+:host(.active),
+:host(.black.active) {
+  background: var(--key-color);
+  box-shadow: none;
+  color: var(--color-key);
+
+  .band {
+    @apply opacity-0;
+  }
+}
+
+/**
+ * Los colores de nota recorren el circulo entero y con el su luminancia, asi que la
+ * tinta clara solo vale para la mitad oscura: sobre el amarillo de un sol sostenido
+ * se queda en 1.2:1 y desaparece. El color manda, de modo que cede el texto.
+ */
+:host(.active.pale),
+:host(.black.active.pale) {
+  color: var(--color-key-sharp);
+}
+
+/**
+ * Sin color por nota: la franja se va y la tecla pulsada se marca con el acento del
+ * tema. Lo que dice que nota es siguen siendo su sitio, su nombre y su grado.
+ */
+:host(.plain) .band {
+  @apply hidden;
+}
+
+:host(.plain.active),
+:host(.plain.black.active) {
+  @apply bg-accent-600;
+
+  color: var(--color-key);
 }

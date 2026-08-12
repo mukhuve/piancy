@@ -1,0 +1,35 @@
+@reference "../../../styles.css";
+
+:host {
+  @apply flex items-center gap-4 min-w-0;
+
+  .title {
+    @apply shrink-0;
+  }
+
+  .scale {
+    @apply flex items-stretch gap-px min-w-0 overflow-hidden;
+  }
+
+  .note {
+    @apply flex flex-col items-center gap-0.5 px-1.5 py-0.5 min-w-0;
+  }
+
+  .swatch {
+    @apply block w-full h-1.5;
+
+    min-width: 1.4rem;
+  }
+
+  .name {
+    @apply font-heading text-[11px] leading-none text-ink;
+
+    letter-spacing: 0.04em;
+  }
+
+  .degree {
+    @apply text-[9px] leading-none text-neutral-600;
+
+    letter-spacing: 0.1em;
+  }
+}

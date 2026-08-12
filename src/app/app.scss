@@ -1,25 +1,118 @@
 @reference "../styles.css";
 
 :host {
-  @apply relative w-full h-full flex flex-col items-center justify-center;
+  @apply flex flex-col h-full w-full overflow-hidden;
 
-  app-piano {
-    z-index: 20;
-  }
+  /* el color de lo que suena tiñe el escenario */
+  --tone-color: transparent;
 
-  .ind {
-    @apply absolute blur-xl rounded-xl z-10 transition-all duration-300 ease-in-out;
-    background-color: var(--tone-color, #000);
-    width: 100%;
-    height: 6px;
+  > header {
+    @apply relative flex items-center gap-2 px-6 py-2 border-b border-divider shrink-0;
 
-    &.active {
-      @apply shadow-2xl blur-3xl;
-      height: 30svw;
+    z-index: 30;
+
+    /* el color de lo que suena, en la linea que cierra la cabecera */
+    &::after {
+      @apply absolute inset-x-0 -bottom-px h-0.5 pointer-events-none;
+
+      content: "";
+      background: var(--tone-color);
+      transition: background 120ms linear;
+    }
+
+    h1 {
+      @apply text-xl;
+    }
+
+    .modes {
+      @apply flex gap-4;
+
+      .mode {
+        @apply font-heading text-sm uppercase cursor-pointer bg-transparent border-none;
+        @apply py-1 text-neutral-500;
+
+        border-bottom: 2px solid transparent;
+        letter-spacing: 0.16em;
+
+        &.on {
+          @apply text-ink;
+
+          border-bottom-color: var(--color-accent-600);
+        }
+      }
+    }
+
+    .chord {
+      @apply font-heading text-sm uppercase text-accent-800 text-right mr-2 ml-auto;
+
+      letter-spacing: 0.12em;
+      min-width: 5rem;
+    }
+
+    /* El metronomo es de toda la app: se oye igual tocando libre que siguiendo una
+       pieza, asi que no puede vivir dentro de la barra de practica, que se apaga. */
+    .metronome {
+      @apply flex items-center gap-1.5 mr-2 pr-3 border-r border-divider;
+
+      /* el mismo alto que el boton de al lado: con su relleno propio el campo salia
+         un par de pixeles mas bajo y las dos cajas no casaban */
+      input {
+        @apply w-14 h-8 px-1.5 py-0 text-sm text-right bg-transparent text-ink border border-divider;
+
+        border-radius: 0;
+        line-height: 1;
+        appearance: textfield;
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          appearance: none;
+          margin: 0;
+        }
+      }
+
+      /* La aguja va y viene al ritmo del pulso: es lo que dice de un vistazo que el
+         metronomo esta puesto y a que velocidad, que solo oyendolo no se sabe. */
+      .needle {
+        transform-origin: 12px 15px;
+        transform: rotate(calc(var(--swing) * 15deg));
+        transition: transform var(--beat) linear;
+      }
+
+      .btn-icon.on {
+        @apply bg-accent-600 text-bg border-accent-600;
+      }
+    }
+
+    .btn-icon.on {
+      @apply bg-accent-600 text-bg border-accent-600;
     }
   }
-}
 
-:host-context(.dark) .ind {
-  background-color: var(--tone-color, #fff);
+  /* marco de los paneles laterales, que se colocan encima sin empujar nada */
+  > .body {
+    @apply relative flex flex-1 min-h-0;
+  }
+
+  /* columna de trabajo: escenario, teclado y barra del pie, siempre del mismo ancho */
+  .main {
+    @apply flex flex-col flex-1 min-w-0 min-h-0;
+  }
+
+  .stage {
+    @apply flex flex-col flex-1 gap-4 m-4 mb-0 min-w-0 min-h-0;
+
+    app-visualizer {
+      @apply flex-1 min-h-0;
+
+      /* con cancion cargada el visualizador se aparta y el carril manda */
+      &.compact {
+        @apply flex-none h-24;
+      }
+    }
+
+    app-lane,
+    app-coming-soon {
+      @apply flex-1 min-h-0;
+    }
+  }
 }

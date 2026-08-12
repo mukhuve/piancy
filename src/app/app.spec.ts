@@ -1,8 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { FakeAudioContext } from './synth/audio-context.fake';
+import { Synth } from './synth/synth';
 
 describe('App', () => {
-  beforeEach(() => TestBed.configureTestingModule({ imports: [App] }));
+  beforeEach(() => {
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    TestBed.configureTestingModule({ imports: [App] });
+  });
 
   it('should create the app', () => {
     expect(TestBed.createComponent(App).componentInstance).toBeTruthy();
@@ -11,9 +16,9 @@ describe('App', () => {
   it('publica el color de las notas que suenan como variable css', () => {
     const fixture = TestBed.createComponent(App);
 
-    fixture.componentInstance.colorize({ notes: [220], range: [220, 880] });
+    TestBed.inject(Synth).noteOn(60);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.style.getPropertyValue('--tone-color')).toBe('rgb(255, 59, 0)');
+    expect(fixture.nativeElement.style.getPropertyValue('--tone-color')).toBe('rgb(0, 255, 184)');
   });
 });

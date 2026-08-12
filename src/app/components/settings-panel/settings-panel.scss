@@ -1,0 +1,67 @@
+@reference "../../../styles.css";
+
+/* La colocacion y el fondo los pone `.sheet`, que comparte con el otro panel. */
+:host {
+  .label {
+    @apply mb-3;
+  }
+
+  .box {
+    @apply flex flex-col gap-2 p-4 mb-6 bg-bg;
+  }
+
+  .item {
+    @apply flex items-baseline justify-between gap-2 px-2.5 py-2 cursor-pointer;
+    @apply font-heading text-sm uppercase text-left text-ink bg-transparent border border-divider;
+
+    letter-spacing: 0.1em;
+
+    &.on {
+      @apply bg-accent-100 border-accent-600;
+    }
+
+    .state {
+      @apply text-[11px] shrink-0;
+
+      letter-spacing: 0.12em;
+    }
+  }
+
+  .langs {
+    @apply flex gap-2;
+
+    .lang {
+      @apply flex-1 py-2 cursor-pointer uppercase;
+      @apply font-heading text-sm text-ink bg-transparent border border-divider;
+
+      letter-spacing: 0.14em;
+
+      &.on {
+        @apply bg-accent-600 text-bg border-accent-600;
+      }
+    }
+  }
+
+  .midi {
+    @apply flex items-center gap-1.5;
+
+    .label {
+      @apply mb-0;
+    }
+
+    .dot {
+      @apply block w-[7px] h-[7px] bg-neutral-400;
+
+      &.on {
+        @apply bg-accent-600;
+      }
+    }
+
+    .link {
+      @apply ml-auto font-heading text-[10px] uppercase text-accent-700 cursor-pointer;
+      @apply bg-transparent border-none p-0;
+
+      letter-spacing: 0.14em;
+    }
+  }
+}

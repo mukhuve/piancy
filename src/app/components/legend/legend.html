@@ -1,0 +1,11 @@
+<span class="label title">{{ t("legend.title") }} · {{ key() }}</span>
+
+<div class="scale">
+  @for (note of notes(); track note.name) {
+    <div class="note" [title]="note.name">
+      <span class="swatch" [style.background]="note.color"></span>
+      <span class="name">{{ note.name }}</span>
+      <span class="degree">{{ note.degree }}</span>
+    </div>
+  }
+</div>
