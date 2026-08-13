@@ -53,6 +53,7 @@ export const SYNTH_GROUPS: readonly SynthGroup[] = [
       { key: 'decay', label: 'Decay', min: 0.01, max: 2, step: 0.01, format: ms },
       { key: 'sustain', label: 'Sustain', min: 0, max: 1, step: 0.01, format: pct },
       { key: 'release', label: 'Release', min: 0.05, max: 3, step: 0.01, format: ms },
+      { key: 'hammer', label: 'Hammer', min: 0, max: 1, step: 0.01, format: pct },
     ],
   },
   {

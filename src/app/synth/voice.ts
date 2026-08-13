@@ -16,6 +16,15 @@ export interface Voice {
 const SILENCE = 0.0006;
 const MAX_CUTOFF = 17000;
 
+/** Do central. La nota desde la que se mide si una es grave o aguda. */
+const MIDDLE_C = 261.63;
+/** Cuanto se estira y se encoge el decaimiento de una punta del piano a la otra. */
+const TRACKING = { least: 0.45, most: 2.2 };
+/** Lo que dura el golpe del martillo. Mas alla de esto ya no es un golpe. */
+const STRIKE_SECONDS = 0.055;
+/** Sobre que armonico se centra el ruido del golpe. */
+const STRIKE_HARMONIC = 4;
+
 /**
  * Cuanto cabe en el osciloscopio de cada voz. A 44.1 kHz son 186 ms, que dan de
  * sobra para los cuatro ciclos de la nota mas grave del piano y aun dejan margen
@@ -69,19 +78,29 @@ export function playVoice(
   });
 
   const attack = Math.max(0.004, params.attack);
-  const decay = Math.max(0.01, params.decay);
+  const decay = Math.max(0.01, params.decay) * tracking(frequency);
   const peak = Math.max(0.05, velocity) * 0.55;
+  /* Cuanto mas fuerte se pulsa, mas brillante suena: en una cuerda el golpe fuerte no
+     solo suena mas, saca armonicos que el suave no llega a mover. Con el filtro fijo,
+     tocar flojo y tocar fuerte daban la misma nota con el volumen cambiado. */
+  const open = Math.min(MAX_CUTOFF, params.cutoff + params.filtEnv * velocity);
 
   amp.gain.setValueAtTime(0, now);
   amp.gain.linearRampToValueAtTime(peak, now + attack);
-  amp.gain.linearRampToValueAtTime(Math.max(SILENCE, peak * params.sustain), now + attack + decay);
+  /* El decaimiento es exponencial, no lineal: una cuerda pierde energia en proporcion
+     a la que le queda, asi que cae de golpe al principio y se va apagando despues. En
+     rampa lineal la nota se sostiene entera y se corta al final, que es lo que hacia
+     que hasta el piano sonara a organo. */
+  amp.gain.exponentialRampToValueAtTime(
+    Math.max(SILENCE, peak * params.sustain),
+    now + attack + decay
+  );
 
   filter.frequency.setValueAtTime(params.cutoff, now);
-  filter.frequency.linearRampToValueAtTime(
-    Math.min(MAX_CUTOFF, params.cutoff + params.filtEnv),
-    now + attack
-  );
-  filter.frequency.linearRampToValueAtTime(params.cutoff, now + attack + decay);
+  filter.frequency.linearRampToValueAtTime(open, now + attack);
+  filter.frequency.exponentialRampToValueAtTime(params.cutoff, now + attack + decay);
+
+  if (params.hammer > 0) strike(context, sends, params, frequency, velocity);
 
   const lfo = params.lfoDepth > 0 ? createLfo(context, params, filter, oscillators) : undefined;
 
@@ -109,6 +128,76 @@ export function playVoice(
       oscillators[0].onended = () => amp.disconnect();
     },
   };
+}
+
+/**
+ * Cuanto dura la nota segun donde caiga en el piano. En un instrumento de cuerda la
+ * grave se apaga mucho mas despacio que la aguda —mas masa moviendose, menos aire
+ * perdido por ciclo—, y esa diferencia es medio realismo: con el mismo decaimiento
+ * para todas, el bajo suena recortado y el agudo se queda zumbando.
+ */
+function tracking(frequency: number) {
+  const ratio = Math.sqrt(MIDDLE_C / frequency);
+
+  return Math.min(TRACKING.most, Math.max(TRACKING.least, ratio));
+}
+
+/**
+ * El golpe del martillo contra la cuerda: un chasquido de ruido de milisegundos,
+ * filtrado alrededor de la nota para que suene a esa y no a un `psst`. Es lo que mas
+ * separa un piano de una onda que se enciende: el oido reconoce el instrumento por el
+ * ataque, y sin transitorio ninguna envolvente deja de sonar a sintetizador.
+ *
+ * Va derecho al bus y no por la voz: tiene que sonar entero antes de que la
+ * envolvente termine de abrir, y no es la nota, asi que tampoco debe salir dibujado
+ * en su onda.
+ */
+function strike(
+  context: AudioContext,
+  sends: AudioNode[],
+  params: SynthParams,
+  frequency: number,
+  velocity: number
+) {
+  const now = context.currentTime;
+  const noise = context.createBufferSource();
+  const tone = context.createBiquadFilter();
+  const amp = context.createGain();
+
+  noise.buffer = noiseOf(context);
+  tone.type = 'bandpass';
+  tone.frequency.value = Math.min(MAX_CUTOFF, frequency * STRIKE_HARMONIC);
+  tone.Q.value = 0.7;
+
+  amp.gain.setValueAtTime(params.hammer * velocity * 0.5, now);
+  amp.gain.exponentialRampToValueAtTime(SILENCE, now + STRIKE_SECONDS);
+
+  noise.connect(tone);
+  tone.connect(amp);
+  sends.forEach((send) => amp.connect(send));
+
+  noise.start(now);
+  noise.stop(now + STRIKE_SECONDS);
+  noise.onended = () => amp.disconnect();
+}
+
+/** Un segundo de ruido, uno por contexto: rellenarlo en cada nota cuesta y suena igual. */
+const noises = new WeakMap<AudioContext, AudioBuffer>();
+
+function noiseOf(context: AudioContext) {
+  let noise = noises.get(context);
+
+  if (!noise) {
+    noise = context.createBuffer(1, context.sampleRate, context.sampleRate);
+
+    const samples = noise.getChannelData(0);
+
+    for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+
+    noises.set(context, noise);
+  }
+
+  return noise;
 }
 
 /**

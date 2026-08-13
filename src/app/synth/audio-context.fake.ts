@@ -1,10 +1,24 @@
 /** jsdom no trae Web Audio API: lo minimo para que el sintetizador funcione en tests. */
 class FakeParam {
   value = 0;
-  setValueAtTime = () => this;
-  linearRampToValueAtTime = () => this;
-  exponentialRampToValueAtTime = () => this;
+  /**
+   * Lo que se le ha programado, en orden. La forma de una envolvente —lo que tarda
+   * en apagarse una nota y si cae recta o curva— no se puede comprobar de otra
+   * manera sin oirla.
+   */
+  readonly ramps: { curve: 'step' | 'linear' | 'exponential'; value: number; at: number }[] = [];
+
+  setValueAtTime = (value: number, at: number) => this.schedule('step', value, at);
+  linearRampToValueAtTime = (value: number, at: number) => this.schedule('linear', value, at);
+  exponentialRampToValueAtTime = (value: number, at: number) =>
+    this.schedule('exponential', value, at);
   cancelScheduledValues = () => this;
+
+  private schedule(curve: 'step' | 'linear' | 'exponential', value: number, at: number) {
+    this.ramps.push({ curve, value, at });
+
+    return this;
+  }
 }
 
 /**
@@ -105,6 +119,13 @@ export class FakeAudioContext {
       ratio: new FakeParam(),
       attack: new FakeParam(),
       release: new FakeParam(),
+    });
+  createBufferSource = () =>
+    Object.assign(new FakeNode('noise'), {
+      buffer: null,
+      onended: null as (() => void) | null,
+      start: () => undefined,
+      stop: () => undefined,
     });
   createBuffer = (channels: number, length: number) => ({
     numberOfChannels: channels,
