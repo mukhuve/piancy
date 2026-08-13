@@ -26,11 +26,14 @@ import { Synth } from '../../synth/synth';
     '(pointerenter)': 'drag($event)',
     '(pointerup)': 'release()',
     '(pointerleave)': 'release()',
-    '(keydown.enter)': 'start()',
-    '(keyup.enter)': 'release()',
+    /* el sistema puede quedarse con el dedo a media nota —un gesto suyo, una llamada—
+       y entonces no llega ningun `pointerup` que la suelte */
+    '(pointercancel)': 'release()',
+    '(keydown.enter)': 'type()',
+    '(keyup.enter)': 'untype()',
     '(keydown.arrowright)': 'moved.emit(1)',
     '(keydown.arrowleft)': 'moved.emit(-1)',
-    '(blur)': 'release()',
+    '(blur)': 'untype()',
   },
 })
 export class Tile {
@@ -55,6 +58,9 @@ export class Tile {
   readonly color = computed(() => toCss(this.rgb()));
   /** Sobre los colores claros el texto en claro no se lee; hay que darle la vuelta. */
   readonly pale = computed(() => isPale(this.rgb()));
+
+  /** La tecla suena porque se aprieta Enter, y no porque haya un dedo encima. */
+  private typed = false;
 
   focus() {
     this.host.nativeElement.focus();
@@ -84,6 +90,27 @@ export class Tile {
   /** Arrastrar el puntero por el teclado toca, mientras siga pulsado. */
   drag(event: PointerEvent) {
     if (event.buttons > 0) this.press();
+  }
+
+  /** Con Enter la tecla suena mientras se mantiene, como si se pulsara. */
+  type() {
+    this.typed = true;
+    this.start();
+  }
+
+  /**
+   * Si el foco se va a otra parte con Enter apretado no llega ningun `keyup` y la nota
+   * se quedaria colgada, asi que el foco perdido tambien la suelta. Pero solo si la
+   * puso el teclado: tocar un acorde en una pantalla es enfocar una tecla tras otra, y
+   * cada una le quitaba el foco a la anterior y con el la nota, de modo que solo
+   * llegaba a sonar la ultima. El dedo y el raton ya tienen su `pointerup` y su
+   * `pointerleave`, que llegan siempre.
+   */
+  untype() {
+    if (!this.typed) return;
+
+    this.typed = false;
+    this.release();
   }
 
   press() {

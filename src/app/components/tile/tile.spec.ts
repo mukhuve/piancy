@@ -54,6 +54,19 @@ describe('Tile', () => {
     expect(synth.playing()).toEqual([60]);
   });
 
+  it('perder el foco no suelta la nota que puso un dedo, y si la que puso Enter', () => {
+    // un acorde en una pantalla es enfocar una tecla tras otra, y cada tecla nueva le
+    // quita el foco a la anterior: si el foco perdido soltara, solo sonaria la ultima
+    component.start(new PointerEvent('pointerdown'));
+    fixture.nativeElement.dispatchEvent(new FocusEvent('blur'));
+    expect(synth.playing()).toEqual([60]);
+
+    component.release();
+    component.type();
+    fixture.nativeElement.dispatchEvent(new FocusEvent('blur'));
+    expect(synth.playing()).toEqual([]);
+  });
+
   it('se anuncia como boton pulsable con el nombre de la nota', () => {
     expect(fixture.nativeElement.getAttribute('role')).toBe('button');
     expect(fixture.nativeElement.getAttribute('aria-label')).toBe('C4');
