@@ -2,12 +2,19 @@
 /// sola vez: repartidas por los archivos, la primera que se toca deja a las demas
 /// diciendo otra cosa y el diseño se parte por la mitad.
 
-/// Un movil tumbado. El ancho es lo unico que le hace falta a un teclado, asi que
-/// esa es la unica postura util; se reconoce por el alto, que es lo que se queda
-/// corto, y por no haber puntero que se pose encima. La misma consulta vive en
-/// `app/layout/viewport.ts`, que es quien decide que se dibuja y que no.
+/// Un telefono. Se reconoce por el lado corto —el que se queda corto se mire como se
+/// mire— y por no haber puntero que se pose encima. Vale igual de pie que tumbado
+/// porque la app se pone de lado ella sola: ver el mixin `upright`. La misma consulta
+/// vive en `app/layout/viewport.ts`, que es quien decide que se dibuja y que no.
 @mixin compact {
-  @media (hover: none) and (max-height: 600px) {
+  @media (hover: none) and ((max-width: 600px) or (max-height: 600px)) {
+    @content;
+  }
+}
+
+/// El telefono cogido de pie, que es donde no hay ancho para un teclado.
+@mixin upright {
+  @media (hover: none) and (orientation: portrait) and (max-width: 700px) {
     @content;
   }
 }

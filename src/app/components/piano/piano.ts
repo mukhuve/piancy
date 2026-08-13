@@ -31,6 +31,10 @@ const WHEEL_STEP = 26;
     '(window:keydown)': 'press($event)',
     '(window:keyup)': 'release($event)',
     '(wheel)': 'scroll($event)',
+    /* Mantener una tecla pulsada es tocarla, no pedir un menu: en un movil, dejar el
+       dedo encima abria el de Chrome y se llevaba por delante la nota. Solo aqui, que
+       en el resto de la app el menu del navegador no molesta a nadie. */
+    '(contextmenu)': '$event.preventDefault()',
   },
 })
 export class Piano {

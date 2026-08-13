@@ -176,27 +176,29 @@
       @apply gap-2 m-2 mb-0;
     }
   }
-}
 
-/**
- * De pie el teclado no existe, asi que tampoco existe la app: tapa entera en vez de
- * dar una version peor de si misma. Se va sola al girar, sin nada que pulsar.
- */
-.rotate {
-  @apply fixed inset-0 z-50 flex flex-col items-center justify-center gap-4;
-  @apply bg-bg text-center px-8;
+  /**
+   * De pie el telefono no da ancho, y un teclado es todo ancho. En vez de pedir que se
+   * gire —que es cargarle el trabajo al que toca, y encima con el giro bloqueado no
+   * sirve de nada— se gira la app: se pone de lado dentro de la pantalla y el teclado
+   * sale igual de largo se coja el telefono como se coja. Las medidas van cruzadas a
+   * proposito: el alto de la app es el ancho de la pantalla.
+   */
+  @include media.upright {
+    @apply fixed;
 
-  svg {
-    @apply w-12 h-12 text-accent-600;
+    top: 0;
+    left: 100svw;
+    width: 100svh;
+    height: 100svw;
+    transform: rotate(90deg);
+    transform-origin: 0 0;
 
-    stroke-width: 1.5;
-  }
-
-  h2 {
-    @apply text-2xl text-accent-800;
-  }
-
-  p {
-    @apply m-0 max-w-xs text-sm text-neutral-700;
+    /* girada, los bordes de la app caen en otros lados del telefono: el izquierdo en
+       la muesca de arriba, el derecho en la barra de gestos y el de abajo —donde
+       estan las teclas— en el canto izquierdo */
+    padding-left: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-bottom, 0px);
+    padding-bottom: env(safe-area-inset-left, 0px);
   }
 }

@@ -204,19 +204,3 @@
     }
   }
 </div>
-
-<!-- De pie no hay diseño que salve un teclado: la tecla blanca se queda en 17 px y no
-     se acierta ninguna. Antes que dar una version peor, se pide girar el telefono. -->
-@if (viewport.portrait()) {
-  <div class="rotate" animate.enter="fade-in">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-      <rect x="8" y="3" width="8" height="18" rx="1.5"></rect>
-      <path d="M11 18.5h2"></path>
-      <path d="M20.5 9.5A8.5 8.5 0 0 0 18 5.6"></path>
-      <path d="m17.4 8.9 3.1.6.6-3.1"></path>
-    </svg>
-
-    <h2>{{ t("rotate.title") }}</h2>
-    <p>{{ t("rotate.text") }}</p>
-  </div>
-}

@@ -9,6 +9,9 @@
   border-radius: 0;
   user-select: none;
   touch-action: none;
+  /* el aviso de iOS al dejar el dedo encima, que no manda ningun `contextmenu` que
+     poder cancelar como hace Chrome */
+  -webkit-touch-callout: none;
 
   .shortcut {
     @apply flex items-center justify-center w-4 h-4 text-[9px] uppercase;
