@@ -5,8 +5,8 @@ import { FakeAudioContext } from '../../synth/audio-context.fake';
 import { Synth } from '../../synth/synth';
 import { Piano } from './piano';
 
-/** Con tres octavas la ventana son 22 blancas y el primer do visible es C1. */
-const TYPING_BASE = 24;
+/** Con tres octavas la ventana son 22 blancas y arranca en el do de la mano izquierda. */
+const TYPING_BASE = 48;
 
 describe('Piano', () => {
   let component: Piano;
@@ -45,15 +45,17 @@ describe('Piano', () => {
   });
 
   it('desplaza la ventana con z y x, sin dejar notas colgadas', () => {
+    const start = keyboard.first();
+
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
     expect(synth.playing()).toHaveLength(1);
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'x' }));
-    expect(keyboard.first()).toBe(7);
+    expect(keyboard.first()).toBe(start + 7);
     expect(synth.playing()).toEqual([]);
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'z' }));
-    expect(keyboard.first()).toBe(0);
+    expect(keyboard.first()).toBe(start);
   });
 
   it('ignora el teclado mientras se escribe en un campo', () => {

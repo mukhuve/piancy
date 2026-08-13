@@ -4,8 +4,8 @@ import { FakeAudioContext } from '../synth/audio-context.fake';
 import { Synth } from '../synth/synth';
 import { Keyboard } from './keyboard';
 
-/** Con tres octavas la ventana son 22 blancas y el primer do visible es C1. */
-const TYPING_BASE = 24;
+/** Con tres octavas la ventana son 22 blancas y arranca en el do de la mano izquierda. */
+const TYPING_BASE = 48;
 
 describe('Keyboard', () => {
   let keyboard: Keyboard;
@@ -22,7 +22,7 @@ describe('Keyboard', () => {
   });
 
   it('no deja que la ventana se salga del piano', () => {
-    keyboard.move(-10);
+    keyboard.move(-WHITE_KEYS.length);
     expect(keyboard.whites().at(0)).toBe(WHITE_KEYS.at(0));
 
     keyboard.move(WHITE_KEYS.length * 2);

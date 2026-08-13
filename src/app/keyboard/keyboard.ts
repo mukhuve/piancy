@@ -4,8 +4,14 @@ import { Key, WHITE_KEYS, layout } from '../music/keyboard';
 import { Synth } from '../synth/synth';
 
 const OCTAVE = 12;
-/** Blancas minimas visibles, para que el teclado no se quede en nada. */
-const MIN_KEYS = 10;
+/** Blancas minimas visibles: una octava justa, de do a do, que es lo que se toca. */
+const MIN_KEYS = 8;
+/**
+ * Por donde se abre el piano. Empezaba en A0, el extremo grave, que con veintidos
+ * teclas a la vista ya era un arranque raro y con una octava no vale para nada:
+ * lo que se toca al sentarse esta alrededor del do central.
+ */
+const START = WHITE_KEYS.indexOf(48);
 
 /** Una tecla colocada, con la tecla del ordenador que le toca si la hay. */
 export interface PianoKey extends Key {
@@ -20,7 +26,7 @@ export interface PianoKey extends Key {
 export class Keyboard {
   readonly octaves = signal(3);
   /** Primera blanca visible, como indice sobre las 52 del piano. */
-  readonly first = signal(0);
+  readonly first = signal(START);
 
   readonly size = computed(() => Math.max(MIN_KEYS, Math.round(this.octaves() * 7) + 1));
 
