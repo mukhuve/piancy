@@ -41,12 +41,13 @@ export class App {
   readonly isPlay = computed(() => this.settings.mode() === 'play');
   /**
    * Cuantas octavas caben tocandose con el dedo. En un movil tumbado, tres octavas
-   * dejan la tecla blanca en 38 px, dos en 56 y una en 103 —16 mm, dos tercios de una
-   * tecla de piano de verdad—. Acertar la nota se acierta desde 44, pero con 56 no
-   * cabe un dedo adulto encima sin tocar la de al lado: para eso esta el mapa, que
-   * corre el piano entero por debajo de la octava que se ve.
+   * dejan la tecla blanca en 38 px y dos en 56: la nota se acierta desde 44, pero un
+   * dedo adulto no cabe encima sin rozar la de al lado. Once blancas la dejan en 75
+   * —11.6 mm, la mitad de una tecla de piano de verdad— y son la octava entera mas
+   * tres, que es lo que hay que ver para no tocar contra el borde. Con la octava
+   * pelada faltaban vecinas; el resto del piano lo trae el mapa.
    */
-  readonly octaves = computed(() => (this.viewport.compact() ? 1 : 3));
+  readonly octaves = computed(() => (this.viewport.compact() ? 1.4 : 3));
   /**
    * En un movil tumbado no caben el escenario y el teclado a la vez, y en Aprender lo
    * que hay que leer es el escenario: en la franja de 69 px que le quedaba, el cartel
